@@ -1,0 +1,247 @@
+{"emotions": [
+    {
+        "id": 1
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 99.34895324707031
+    },
+    {
+        "Type": "CALM",
+        "Confidence": 0.1007080078125
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 0.04298686981201172
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 0.007383525371551514
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 0.005424022674560547
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 0.005284945480525494
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 0.0010132789611816406
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 0.00026226043701171875
+    },
+    {
+        "id": 2
+    },
+    {
+      "Type": "CALM",
+      "Confidence": 96.86104583740234
+    },
+    {
+      "Type": "SAD",
+      "Confidence": 1.174163818359375
+    },
+    {
+      "Type": "ANGRY",
+      "Confidence": 0.6744384765625
+    },
+    {
+      "Type": "CONFUSED",
+      "Confidence": 0.14837583899497986
+    },
+    {
+      "Type": "DISGUSTED",
+      "Confidence": 0.06127357482910156
+    },
+    {
+      "Type": "FEAR",
+      "Confidence": 0.056171417236328125
+    },
+    {
+      "Type": "SURPRISED",
+      "Confidence": 0.013008713722229004
+    },
+    {
+      "Type": "HAPPY",
+      "Confidence": 0.0022550425492227077
+    },
+    {
+        "id": 3
+    },
+    {
+        "Type": "CALM",
+        "Confidence": 90.86216735839844
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 3.1219482421875
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 2.5787353515625
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 0.2770423889160156
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 0.13408660888671875
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 0.11091232299804688
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 0.015601515769958496
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 0.0013510386925190687
+    },
+    {
+        "id": 4
+    },
+    {
+        "Type": "CALM",
+        "Confidence": 43.30171203613281
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 28.564453125
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 11.224365234375
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 1.57928466796875
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 0.884246826171875
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 0.2422332763671875
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 0.017061829566955566
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 0.0018378099193796515
+    },
+    {
+        "id": 5
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 76.953125
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 17.1630859375
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 2.56195068359375
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 1.6009012460708618
+    },
+    {
+        "Type": "CALM",
+        "Confidence": 1.324462890625
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 0.03676414489746094
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 0.0008493661880493164
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 0.00012715658522211015
+    },
+    {
+        "id": 6
+    },
+      {
+        "Type": "CALM",
+        "Confidence": 51.949222564697266
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 8.477783203125
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 7.568359375
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 5.7881669998168945
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 3.7322998046875
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 0.141143798828125
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 0.046640634536743164
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 0.017468135803937912
+    },
+    {
+        "id": 7
+    },
+    {
+        "Type": "FEAR",
+        "Confidence": 52.44140625
+    },
+    {
+        "Type": "CALM",
+        "Confidence": 15.5322265625
+    },
+    {
+        "Type": "CONFUSED",
+        "Confidence": 14.9677734375
+    },
+    {
+        "Type": "SAD",
+        "Confidence": 5.133056640625
+    },
+    {
+        "Type": "ANGRY",
+        "Confidence": 3.5003662109375
+    },
+    {
+        "Type": "DISGUSTED",
+        "Confidence": 2.41546630859375
+    },
+    {
+        "Type": "SURPRISED",
+        "Confidence": 1.4715194702148438
+    },
+    {
+        "Type": "HAPPY",
+        "Confidence": 0.008980432525277138
+    }
+]}
