@@ -1,106 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react' 
-import Webcam from "react-webcam" 
-import './App.css' 
+import React, { useState, useRef, useEffect, Webcam } from 'react'
+import './Emotions.css'
 
-// T3
-function WebcamImage() {
-  // const [img, setImg] = useState(null)
-  // const webcamRef = useRef(null)
-  
-  // T3
-  // const capture = useCallback(() => {
-  //   const imageSrc = webcamRef.current.getScreenshot() 
-  //   setImg(imageSrc) 
-  // }, [webcamRef]) 
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const imageSrc = webcamRef.current.getScreenshot() 
-  //     setImg(imageSrc) 
-  //     // API's work - detect emotion
-  //   }, 5000)
-    
-  //   return () => {
-  //     clearInterval(interval)
-  //     console.log(img)
-  //     setImg(null)
-  //   }
-  // }, [img])
-
-
-  // return (
-
-  //   // T3
-  //   <div className="Container">
-  //     {/* {img === null ? ( */}
-  //       <>
-  //         <Webcam
-  //           audio={false}
-  //           mirrored={true}
-  //           height={300}
-  //           width={300}
-  //           ref={webcamRef}
-  //           screenshotFormat="image/jpeg"
-  //           videoConstraints={videoConstraints}
-  //         />
-  //         <button onClick={capture}>Capture</button>
-  //       </>
-  //     {/* ) : (
-  //       <>
-  //         <img src={img} alt="screenshot" />
-  //         <button onClick={() => setImg(null)}>Retake</button>
-  //       </>
-  //     )} */}
-  //   </div>
-  // ) 
-}
-
-// T2
-function App() {
-  const [showEmails, setShowEmails] = useState(true) 
-  const [showTasks, setShowTasks] = useState(false) 
-
-  // Function for switching between emails and tasks tab
-  function showTab(tab) {
-    if(tab === "email") {
-      setShowEmails(true)
-      setShowTasks(false)
-    }
-    else {
-      setShowEmails(false)
-      setShowTasks(true)
-    }
-  }
-
-  const [emailData, setEmailData] = useState([{}])
-  const [taskData, setTaskData] = useState([{}])
-
-  // Fetch emails and tasks from the backend and assign the data to the states
-  useEffect(() => {
-    fetch("/emails")
-    .then(
-      response => response.json()
-    )
-    .then(
-      data => {
-        setEmailData(data)
-      }
-    )
-
-    fetch("/tasks")
-    .then(
-      response => response.json()
-    )
-    .then(
-      data => {
-        setTaskData(data)
-      }
-    )
-
-  }, [])
-
-  // Capturing and detecting emotions
-
+const Emotions = () => {
   // states and refs
   const [camOn, setCamOn] = useState(false)
   const [emotions, setEmotions] = useState([{}])
@@ -208,55 +109,33 @@ function App() {
   useEffect(() => {
     const confidence = emotions[0].Confidence
     const type = emotions[0].Type
+    // if (camOn) {
+      // console.log(emotions[0].Confidence) // by default the emotion with the highest value is at the top
       const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-
+      // const negative_emotions = ['CALM', 'SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
+      // console.log(Object.values(negative_emotions))
       
       negative_emotions.forEach((emotion, index) => {
         if (confidence > 30 && type === emotion) 
         {  
           setStressed(true)
+          // console.log(emotion)
         }
         
       })
+    // }
 
     return () => setStressed(false)
   })
-  // useEffect(() => {
-  //   const confidence = emotions[0].Confidence
-  //   const type = emotions[0].Type
-  //   // if (camOn) {
-  //     // console.log(emotions[0].Confidence) // by default the emotion with the highest value is at the top
-  //     const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-  //     // const negative_emotions = ['CALM', 'SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-  //     // console.log(Object.values(negative_emotions))
-      
-  //     negative_emotions.forEach((emotion, index) => {
-  //       if (confidence > 30 && type === emotion) 
-  //       {  
-  //         setStressed(true)
-  //         // console.log(emotion)
-  //       }
-        
-  //     })
-  //   // }
-
-  //   return () => setStressed(false)
-  // })
 
   const videoConstraints = {
     width: 200,
     height: 180,
     facingMode: "user",
   } 
-
-
-  return(
-    <div className = "App">
-      <title>Wave</title>
-
-      {/* <WebcamImage /> */}
-      <div className = 'Camera-emotion-container'>
-        <div className = 'Camera'> 
+  return (
+    <div>
+      <div className = 'Camera'> 
         <Webcam 
           ref = {webcamRef}
           audio = {false}
@@ -316,52 +195,9 @@ function App() {
             <p>No emotion data available.</p>
           )} */}
         </div>
-        {/* <hr /> */}
-      </div>
-
-      <header className = "App-header">
-        <button className = {showEmails ? "Active-btn Change-tab-btns" : "Change-tab-btns"} onClick = {() => {showTab("email")}} >Emails</button>
-        <button className = {showTasks ? "Active-btn Change-tab-btns" : "Change-tab-btns"} onClick = {() => {showTab("task")}} >Tasks</button>
-      </header>
-
-      {/* Show loading if data is not fetched or is currently fetching, otherwise show data */}
-      <div className = 'Content-container' 
-        style = {{
-          boxShadow: `1px 1px 15px 2px ${stressed ? 'green' : 'darkgrey'}`, transition: 'box-shadow 0.5s ease-in'
-        }}
-      >
-        {/* Emails */}
-        {(typeof emailData === 'undefined') ? (
-          <p>Loading...</p>
-        ) : (showEmails 
-          ? 
-            emailData.map((email, index) => (
-              <div key = {index} className = 'Container-items'>
-                <p style={{fontWeight: 'bold'}} >{email.title}</p>
-                <p>{email.body}</p>
-                <p style = {{border: '1px solid gray', width: '130px', borderRadius: '5px', textAlign: 'center'}} >{email.tags}</p>
-              </div>
-            ))
-          : <div></div>
-        )}
-
-        {/* Tasks */}
-        {(typeof taskData === 'undefined') ? (
-          <p>Loading...</p>
-        ) : (showTasks 
-            ?
-              taskData.map((task, index) => (
-                <div key = {index} className = 'Container-items'>
-                  <p style={{fontWeight: 'bold'}} >{task.title}</p>
-                  <p>{task.body}</p>
-                  <p style = {{border: '1px solid gray', width: '130px', borderRadius: '5px', textAlign: 'center'}} >{task.tags}</p>
-                </div>
-              ))
-            : <div></div>
-        )}
-      </div>
     </div>
   )
 }
 
-export default App 
+// export const stressed = stressed
+export default Emotions
