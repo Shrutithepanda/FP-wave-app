@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import supabase from '../supabase/supabaseClient'
 import { Link, useNavigate } from 'react-router-dom'
-import { LineWave } from 'react-loader-spinner'
 import { useAuth } from '../hooks/AuthProvider'
 import Loader from '../customComponents/Loader'
 
@@ -34,10 +32,12 @@ const LoginPage = () => {
       setLoading(true)
   
       const {data, error} = await login(email, password)
+      if (data) {
+        navigate("/emails")
+        // navigate("/")
+        // console.log(data)
+      }
       if (error) setMessage(error)
-
-      // if (data) navigate("/")
-      // if (user && session) navigate("/")
       
       setLoading(false)
       
@@ -56,7 +56,7 @@ const LoginPage = () => {
         <h2>Login</h2>
         <br></br>
 
-        <Link to = "/Home" >Home</Link>
+        <Link to = "/home" >Home</Link>
         <br></br>
 
         {/* If there is a message, display it */}
@@ -81,7 +81,7 @@ const LoginPage = () => {
             required
           />
 
-          <button type = 'submit' >
+          <button type = 'submit' data-testid = "login-btn" >
             Login
           </button>
         </form>

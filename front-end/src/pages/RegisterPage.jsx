@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import supabase from '../supabase/supabaseClient'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/AuthProvider'
 import Loader from '../customComponents/Loader'
@@ -9,14 +8,14 @@ import Loader from '../customComponents/Loader'
  * @returns contents of the Register page: forms and submit button
  */
 const RegisterPage = () => {
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState("")
   
-  const { register } = useAuth()
-
+  const { register, session } = useAuth()
+  // console.log(session)
   /**
    * 
    * Handle user registration with values passed in input fields. If error is returned display the error message.
@@ -29,17 +28,20 @@ const RegisterPage = () => {
     setEmail("")
     setPassword("")
 
+    setLoading(true)
     try {
-      setLoading(true)
   
-      await register(email, password)
+      const result = await register(email, password)
+
+      if (result.success) navigate("/emails")
 
       
     } catch (error) {
       // console.log(error.message)
       setMessage(error.message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
     
   }
 
@@ -57,7 +59,7 @@ const RegisterPage = () => {
       <h2>Register</h2>
       <br></br>
       
-      <Link to = "/Home" >Home</Link>
+      <Link to = "/home" >Home</Link>
       <br></br>
 
       {/* If there is a message, display it */}
@@ -82,13 +84,10 @@ const RegisterPage = () => {
           required
         />
 
-        <button type = 'submit' >
+        <button type = 'submit' disabled = {loading} >
           Register
         </button>
 
-        {/* <button type = 'button' onClick = {handleDeleteUser} >
-          Delete user
-        </button> */}
       </form>
 
       <span>Already have an account?</span>

@@ -1,16 +1,19 @@
 import React, { useContext, createContext, useState, useEffect } from 'react'
 import supabase from '../supabase/supabaseClient'
-import { useNavigate, Navigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
+import Loader from '../customComponents/Loader'
 
 // Create auth context
-const AuthContext = createContext()
+// const AuthContext = createContext()
+const AuthContext = createContext({user: null})
 
 /**
  * 
  * @returns an Auth context provider to wrap the App component around
  */
 function AuthProvider ({children}) {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
+    const [session, setSession] = useState(undefined)
     const [user, setUser] = useState(null)
     const [authenticated, setAuthenticated] = useState(null)
     const [loading, setLoading] = useState(null)
@@ -26,13 +29,21 @@ function AuthProvider ({children}) {
             email: email,
             password: password,
         })
+
         
-        if (data?.user !== null) {
-            navigate("/")
+        // if (data?.user !== null) {
+        if (data) {
+            // console.log(data)
+            // navigate("/")
+
+            setUser(data.user)
+            setAuthenticated(true)
+            return {success: true, data}
         }
         
         if (error) {
-            throw error
+            return {success: false, error: error.message}
+            // throw error
         }
     }
     
@@ -57,22 +68,31 @@ function AuthProvider ({children}) {
      * Register the user and log in the user if session exists
      */
     const register = async (email, password) => {
-        const {data: {session}, error} = await supabase.auth.signUp({
-            email,
-            password
+        // const {data: {session}, error} = await supabase.auth.signUp({
+        //     email,
+        //     password
+        // })
+        
+        // if (session) {
+            
+        //     await login(email, password)
+        // }
+        const {data, error} = await supabase.auth.signUp({
+            email: email,
+            password: password
         })
         
-        if (session) {
-            
-            await login(email, password)
-        }
         if (error) {
-            throw error
+            // throw error
+            return {success: false, error: error.message}
         }
+
+        return {success: true, data}
     }
 
     useEffect(() => {
-        setLoading(true)
+        // setLoading(true)
+
         /**
          * Get the details for the current user. 
          * Set user to the data and authenticated to true.
@@ -82,9 +102,17 @@ function AuthProvider ({children}) {
             const {user: currentUser} = data
             setUser(currentUser ?? null)
             setAuthenticated(true)
+            setLoading(false)
             // console.log(data.user)
         }
-        setLoading(false)
+        getUser()
+
+        supabase.auth.getSession()
+        .then(
+            ({data: {session}}) => {
+                setSession(session)
+            }
+        )
         
         /**
          * Runs when any auth event occurs. 
@@ -94,19 +122,21 @@ function AuthProvider ({children}) {
             if (session) {
                 setUser(session.user)
                 setAuthenticated(true)
+                setSession(session)
+                setLoading(false)
             }
         })
         
-        getUser()
-        return () => data.subscription.unsubscribe() // Clean up
+        return () => data?.subscription.unsubscribe() // Clean up
     }, [])
 
     return (
         // Return Auth context provider
         <AuthContext.Provider
-            value = {{ user, authenticated, login, logout, register }}
+            value = {{ user, authenticated, session, login, logout, register }}
         >
-            {loading === false && children}
+            {/* {loading === false && children} */}
+            {loading === false ? children : <Loader/>}
         </AuthContext.Provider>
     )
 }

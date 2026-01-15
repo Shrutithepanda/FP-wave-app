@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react' 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import supabase from '../supabase/supabaseClient'
 import { useAuth } from '../hooks/AuthProvider'
-import { useNavigate, Navigate } from 'react-router-dom'
 
 import Webcam from "react-webcam" 
 import './App.css'
@@ -16,6 +15,7 @@ import Emails from '../emails/Emails'
 import Tasks from '../tasks/Tasks'
 import Emotions from '../emotions/Emotions'
 import AuthProvider from '../hooks/AuthProvider'
+import Container from 'react-bootstrap/esm/Container'
 // import { stressed } from '../emotions/Emotions'
 
 // T3
@@ -228,50 +228,51 @@ const App = () => {
   return(
     // <BrowserRouter>
     
-    // <>
-    //   {user ? <PrivatePages /> : <GuestPages />}
-    // </>
-
-    <> {/* container */}
-      <Routes >
-        {/* Home page */}
-        <Route 
-          path = '/Home'
-          element = { <HomePage/> }
-        />
-
-        {/* Register page */}
-        <Route 
-          path = '/register'
-          element = {<RegisterPage/>}
-        />
-
-        {/* Login page */}
-        <Route 
-          path = '/login'
-          element = {<LoginPage/>}
-        />
-
-        <Route element = {<ProtectedRoutes />} >
-          {/* Emails page - only visible to logged in users */}
-          <Route 
-            path = '/'
-            element = {
-              <Emails/>
-            }
-          />
-
-          {/* Tasks page - only visible to logged in users */}
-          <Route 
-            path = '/tasks'
-            element = {
-              <Tasks/>
-            }
-          />
-        </Route>
-
-      </Routes>
+    <>
+      <RegisterPage />
     </>
+
+    // <Container> 
+    //   <Routes >
+        
+    //     {/* Home page */}
+    //     <Route 
+    //       path = '/home'
+    //       element = { <HomePage/> }
+    //     />
+
+    //     {/* Register page */}
+    //     <Route 
+    //       path = '/register'
+    //       element = {<RegisterPage/>}
+    //     />
+
+    //     {/* Login page */}
+    //     <Route 
+    //       path = '/login'
+    //       element = {<LoginPage/>}
+    //     />
+
+    //     <Route element = {<ProtectedRoutes />} >
+    //       {/* Emails page - only visible to logged in users */}
+    //       <Route 
+    //         path = '/'
+    //         element = {
+    //           <Emails/>
+    //         }
+    //       />
+
+    //       {/* Tasks page - only visible to logged in users */}
+    //       <Route 
+    //         path = '/tasks'
+    //         element = {
+    //           <Tasks/>
+    //         }
+    //       />
+    //     </Route>
+
+    //   </Routes>
+    // </Container>
 
     // </BrowserRouter>
 

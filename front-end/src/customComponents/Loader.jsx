@@ -9,7 +9,7 @@ import { LineWave } from 'react-loader-spinner'
 const Loader = ({style, show = true, ...props}) => {
     
     return (
-        <div>
+        // <div>
             <LineWave 
                 height = {120} 
                 width = {120} 
@@ -20,7 +20,7 @@ const Loader = ({style, show = true, ...props}) => {
                 {... props}
             />
 
-        </div>
+        // </div>
 
     )
 }
