@@ -13,14 +13,14 @@ function ProtectedRoutes({children}) {
     const { user, authenticated, session } = useAuth()
     // const location = useLocation()
     // console.log("ProtectedRoutes: ", user?.email)
-    // console.log("ProtectedRoutes: ", authenticated)
+    // console.log("ProtectedRoutes: ", session)
 
     if (session === undefined) {
         return <Loader />
     }
     
     // If user is not null and is authenticated return child routes otherwise navigate to Login page
-    return <>{session ? <>{children}</>: <Navigate to = "/" />}</>
+    return <>{session ? <>{children}</>: <Navigate to = "/login" />}</>
 
 }
 // function ProtectedRoutes() {

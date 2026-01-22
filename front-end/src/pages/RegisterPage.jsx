@@ -1,7 +1,29 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/AuthProvider'
 import Loader from '../customComponents/Loader'
+import Form from 'react-bootstrap/Form'
+// import Button from 'react-bootstrap/Button'
+import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
+
+const StyledCard = styled(Card) ({
+  padding: "20px 60px",   
+  backgroundColor: "#F4F4FF",
+  textAlign: "center", 
+  "& > button": {
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: "#42458A"
+  }
+})
+
+const FormContainer = styled(Box)({
+  marginBottom: 10,
+  "& > div": {
+    marginTop: 10,
+    // marginBottom: 10
+  }
+})
 
 /**
  * 
@@ -24,24 +46,29 @@ const RegisterPage = () => {
     event.preventDefault() // prevent automatic refreshing
     setMessage("") // clear any previous message
 
+    if (email === "", password === ""){
+      setMessage("All fields must be filled before proceeding.")
+    }
+    else {
+      setLoading(true)
+      try {
+        
+        const result = await register(email, password)
+        
+        setMessage(result.error)
+        if (result.success) navigate("/emails")
+          
+          
+        } catch (error) {
+          // console.log(error.message)
+          setMessage(error.message)
+        } finally {
+          setLoading(false)
+        }
+    }
     // Clear the fields
     setEmail("")
     setPassword("")
-
-    setLoading(true)
-    try {
-  
-      const result = await register(email, password)
-
-      if (result.success) navigate("/emails")
-
-      
-    } catch (error) {
-      // console.log(error.message)
-      setMessage(error.message)
-    } finally {
-      setLoading(false)
-    }
     
   }
 
@@ -49,50 +76,85 @@ const RegisterPage = () => {
   return (loading 
     ?
       (
-        // Put in some container
         <>
           <Loader />
         </>
       )
     : (
-    <div>
-      <h2>Register</h2>
-      <br></br>
-      
-      <Link to = "/home" >Home</Link>
-      <br></br>
+      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+        <StyledCard>
+          <Typography variant = "h4" style = {{marginBottom: 10}}>Register</Typography>
+          <Link href = "/" >Home</Link>
+          
 
-      {/* If there is a message, display it */}
-      {message && <span>{message}</span>}
+          {/* If there is a message, display it */}
+          {message && <Typography color = "error">{message}</Typography>}
 
-      <form
-        onSubmit = {handleSubmit}
-      >
-        <input 
-          type = 'email' 
-          placeholder = 'Email' 
-          value = {email}
-          onChange = {(e) => setEmail(e.target.value)}
-          required
-        />
-        
-        <input 
-          type = 'password' 
-          placeholder = 'Password' 
-          value = {password}
-          onChange = {(e) => setPassword(e.target.value)}
-          required
-        />
+          <FormContainer
+            // onSubmit = {handleSubmit}
+            // className = "text-start"
+          >
+            <TextField 
+              required
+              // id = "outlined-basic" 
+              label = "Emails address" 
+              variant = "outlined" 
+              size = "small"
+              fullWidth
+              // color = "secondary"
+              value = {email}
+              onChange = {(e) => setEmail(e.target.value)}
+            />
 
-        <button type = 'submit' disabled = {loading} >
-          Register
-        </button>
+            <TextField 
+              required
+              // id = "outlined-basic" 
+              label = "Password" 
+              variant = "outlined" 
+              size = "small"
+              fullWidth
+              // color = "secondary"
+              value = {password}
+              onChange = {(e) => setPassword(e.target.value)}
+            />
+            {/* <Form.Group className = "mb-3">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control 
+                type = 'email' 
+                placeholder = 'Email' 
+                onChange = {(e) => setEmail(e.target.value)}
+                value = {email}
+                required
+              />
+            </Form.Group>
 
-      </form>
+            <Form.Group className = "mb-3">
+              <Form.Label>Password</Form.Label>
+              <Form.Control 
+                type = 'password' 
+                placeholder = 'Password' 
+                onChange = {(e) => setPassword(e.target.value)}
+                value = {password}
+                required
+              />
+            </Form.Group> */}
+          </FormContainer>
 
-      <span>Already have an account?</span>
-      <Link to = "/login">Login</Link>
-    </div>
+          <Button 
+          onClick = {handleSubmit} 
+            variant = "contained" 
+            disabled = {loading} 
+            data-testid = "register-btn"
+          >
+            Register
+          </Button>
+
+          <Typography>
+            Already have an account? 
+            <Link href = "/login">Login</Link>
+          </Typography>
+        </StyledCard>
+      </Box>
     )
   )
 }

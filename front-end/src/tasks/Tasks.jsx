@@ -19,7 +19,7 @@ const Tasks = () => {
 
   return (
     <div>
-      <AppHeader />
+      {/* <AppHeader /> */}
       {/* Show loading if data is not fetched or is currently fetching, otherwise show data */}
       {(typeof taskData === 'undefined') 
       ? (

@@ -2,19 +2,31 @@
 // import express from "express";
 // const app = express();
 // import * as fs from "fs";
-const port = process.env.PORT || 8000;
 
 import express from "express";
 import cors from "cors";
 import { RekognitionClient, DetectFacesCommand } from "@aws-sdk/client-rekognition";
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from "dotenv";
+import supabase from "../front-end/src/supabase/supabaseClient.js";
+import routes from "./routes/route.js";
+
+dotenv.config()
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// app.use(express.json({ limit: "5mb" }));
+
+// router for handling routes related to the email api 
+app.use("/", routes)
+
+const port = process.env.PORT;
 
 const aws_rekognition = new RekognitionClient({
-  region: process.env.AWS_REGION || "us-east-1",
+  // region: process.env.AWS_REGION || "us-east-1",
+  region: process.env.AWS_REGION,
 });
 
 // console.log("AWS key loaded:", !!process.env.AWS_ACCESS_KEY_ID);
@@ -74,16 +86,76 @@ app.post("/emotion_detection_api", async (req, res) => { // original
 // Routes
 
 // Email API
-app.get('/emails', (req, res) => {
-  // Hard coded dummy email data
-  res.json([
-    {title: "Mail item 1", body: "This is the body of the mail.", tags: "high priority"},
-    {title: "Mail item 2", body: "This is the body of the mail. One more statement.", tags: "high priority"},
-    {title: "Mail item 3", body: "This is the body of the mail.", tags: "low priority"},
-    {title: "Mail item 4", body: "This is the body of the mail.", tags: "medium priority"},
-    {title: "Mail item 5", body: "This is the body of the mail. Bye!", tags: "low priority"},
-  ]);
+app.get('/inbox', async (_, res) => {
+  // Get emails from supabase table
+  try {
+    const { data, error } = await supabase
+    .from("Inbox")
+    .select("*")
+
+    return res.send(data)
+    // console.log(data)
+
+  } catch (error) {
+      return res.send({ error })
+  }
 });
+
+// Fetch mails from the emails table with the given id
+// app.get("/emails/:id", async (req, res) => {
+//   console.log(req.params)
+//   // ⚠️ Implement using type to show in folders
+//   try {
+    // const { data, error } = await supabase
+    // .from("Emails")
+    // .select()
+    // .eq("id", req.params.id)
+
+    // return res.send(data)
+
+//   } catch (error) {
+//     return res.send({ error })
+//   }
+// })
+
+// // Create a mail item in the Emails table (Sent tab)
+// // app.post("/create_email", async (req, res) => {
+// app.post("/emails/save", async (req, res) => {
+//   try {
+//     // console.log(req.body)
+//     const { data, error } = await supabase
+//     .from("Emails")
+//     .insert(req.body)
+  
+//     if(error) return res.status(400).json(error)
+//     res.status(200).json(req.body)
+
+//   } catch (error) {
+//     return res.send({ error })
+//   }
+// })
+
+// // Delete a mail item from the Inbox table (Delete tab)
+// app.delete("/emails/:id", async (req, res) => {
+//   // ⚠️ Check how to delete multiple, from emails/inbox table
+//   try {
+//     const { data, error } = await supabase
+//     .from("Inbox")
+//     .delete()
+//     .eq(":id", req.params.id)
+
+//     // Refetch data without the deleted item
+//     const { newData, newError } = await supabase
+//     .from("Inbox")
+//     .select("*")
+
+//     if (error) return res.status(400).json(error)
+//     return res.send(newData)
+
+//   } catch (error) {
+//     return res.send({ error })
+//   }
+// })
 
 app.get('/tasks', (req, res) => {
   // Hard coded dummy task data

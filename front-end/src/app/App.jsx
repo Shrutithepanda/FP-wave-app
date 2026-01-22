@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react' 
-import { Routes, Route } from "react-router-dom"
+import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react' 
+import { Routes, Route, Outlet } from "react-router-dom"
 import supabase from '../supabase/supabaseClient'
 import { useAuth } from '../hooks/AuthProvider'
 
@@ -16,6 +16,11 @@ import Tasks from '../tasks/Tasks'
 import Emotions from '../emotions/Emotions'
 import AuthProvider from '../hooks/AuthProvider'
 import Container from 'react-bootstrap/esm/Container'
+import AppHeader from '../customComponents/AppHeader'
+import SideBar from '../customComponents/Sidebar'
+import Loader from '../customComponents/Loader'
+import { Box } from '@mui/material'
+import { useEmotion } from '../hooks/EmotionProvider'
 // import { stressed } from '../emotions/Emotions'
 
 // T3
@@ -73,75 +78,75 @@ const WebcamImage = () => {
 
 // T2
 const App = () => {
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   // console.log(user)
 
-  const [showEmails, setShowEmails] = useState(true) 
-  const [showTasks, setShowTasks] = useState(false) 
+  // const [showEmails, setShowEmails] = useState(true) 
+  // const [showTasks, setShowTasks] = useState(false) 
 
-  // Function for switching between emails and tasks tab
-  function showTab(tab) {
-    if(tab === "email") {
-      setShowEmails(true)
-      setShowTasks(false)
-    }
-    else {
-      setShowEmails(false)
-      setShowTasks(true)
-    }
-  }
+  // // Function for switching between emails and tasks tab
+  // function showTab(tab) {
+  //   if(tab === "email") {
+  //     setShowEmails(true)
+  //     setShowTasks(false)
+  //   }
+  //   else {
+  //     setShowEmails(false)
+  //     setShowTasks(true)
+  //   }
+  // }
 
   // Capturing and detecting emotions
 
   // states and refs
-  const [camOn, setCamOn] = useState(false)
-  const [emotions, setEmotions] = useState([{}])
-  const [stressed, setStressed] = useState(false)
-  const webcamRef = useRef(null)
-  const captureIntervalRef = useRef(null)
+  // const [camOn, setCamOn] = useState(false)
+  // const [emotions, setEmotions] = useState([{}])
+  // const [stressed, setStressed] = useState(false)
+  // const webcamRef = useRef(null)
+  // const captureIntervalRef = useRef(null)
 
-  useEffect(() => {
-    if(camOn) {
-      // When start is pressed capture photo every 5 seconds and get response from API
-      captureIntervalRef.current = setInterval(captureAndDetectEmotions, 5000)
+  // useEffect(() => {
+  //   if(camOn) {
+  //     // When start is pressed capture photo every 5 seconds and get response from API
+  //     captureIntervalRef.current = setInterval(captureAndDetectEmotions, 5000)
 
-      return () => clearInterval(captureIntervalRef.current)
-    }
-  })
+  //     return () => clearInterval(captureIntervalRef.current)
+  //   }
+  // })
 
-  async function captureAndDetectEmotions() {
-    if (!webcamRef.current) {
-      return
-    }
+  // async function captureAndDetectEmotions() {
+  //   if (!webcamRef.current) {
+  //     return
+  //   }
 
-    const imageSource = webcamRef.current.getScreenshot() 
-    if(!imageSource) {
-      return
-    }
-    // Convert the image to base 64
-    const b64Image = imageSource.replace(/^data:image\/jpeg;base64,/, "");
+  //   const imageSource = webcamRef.current.getScreenshot() 
+  //   if(!imageSource) {
+  //     return
+  //   }
+  //   // Convert the image to base 64
+  //   const b64Image = imageSource.replace(/^data:image\/jpeg;base64,/, "");
 
-    try {
-      // Get APIs response from the image sent
-      const emotionApiResponse = await fetch("/emotion_detection_api", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({image: b64Image})
-      })
+  //   try {
+  //     // Get APIs response from the image sent
+  //     const emotionApiResponse = await fetch("/emotion_detection_api", {
+  //       method: "POST",
+  //       headers: {"Content-Type": "application/json"},
+  //       body: JSON.stringify({image: b64Image})
+  //     })
 
-      const data = await emotionApiResponse.json()
-      const emotionsDetected = data.emotions // Extract the emotions object
+  //     const data = await emotionApiResponse.json()
+  //     const emotionsDetected = data.emotions // Extract the emotions object
 
-      setEmotions(emotionsDetected) // Assign the emotions state the object received
+  //     setEmotions(emotionsDetected) // Assign the emotions state the object received
 
-      // console.log(emotionsDetected) 
-      // setEmotions(data)
+  //     // console.log(emotionsDetected) 
+  //     // setEmotions(data)
       
-    } catch (error) {
-      console.log("Emotion detection failed: ", error)
-    }
+  //   } catch (error) {
+  //     console.log("Emotion detection failed: ", error)
+  //   }
     
-  }
+  // }
 
   // Get response from json file every 5 seconds -> not working ideally
   // const [isFetching, setIsFetching] = useState(false);
@@ -188,93 +193,70 @@ const App = () => {
 
   // Original
   
-  function startCapturing() {
-    setCamOn(true)
-  }
+  // function startCapturing() {
+  //   setCamOn(true)
+  // }
 
-  function stopCapturing() {
-    setCamOn(false)
-    clearInterval(captureIntervalRef.current)
-  }
+  // function stopCapturing() {
+  //   setCamOn(false)
+  //   clearInterval(captureIntervalRef.current)
+  // }
 
-  useEffect(() => {
-    const confidence = emotions[0].Confidence
-    const type = emotions[0].Type
-    // if (camOn) {
-      // console.log(emotions[0].Confidence) // by default the emotion with the highest value is at the top
-      const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-      // const negative_emotions = ['CALM', 'SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-      // console.log(Object.values(negative_emotions))
+  // useEffect(() => {
+  //   const confidence = emotions[0].Confidence
+  //   const type = emotions[0].Type
+  //   // if (camOn) {
+  //     // console.log(emotions[0].Confidence) // by default the emotion with the highest value is at the top
+  //     const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
+  //     // const negative_emotions = ['CALM', 'SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
+  //     // console.log(Object.values(negative_emotions))
       
-      negative_emotions.forEach((emotion, index) => {
-        if (confidence > 30 && type === emotion) 
-        {  
-          setStressed(true)
-          // console.log(emotion)
-        }
+  //     negative_emotions.forEach((emotion, index) => {
+  //       if (confidence > 30 && type === emotion) 
+  //       {  
+  //         setStressed(true)
+  //         // console.log(emotion)
+  //       }
         
-      })
-    // }
+  //     })
+  //   // }
 
-    return () => setStressed(false)
-  })
+  //   return () => setStressed(false)
+  // })
 
-  const videoConstraints = {
-    width: 200,
-    height: 180,
-    facingMode: "user",
-  } 
+  // const videoConstraints = {
+  //   width: 200,
+  //   height: 180,
+  //   facingMode: "user",
+  // } 
+
+  // Sidebar logic
+  const [openSidebar, setOpenSidebar] = useState(true)  
+  const toggleSidebar = () => setOpenSidebar(prevState => !prevState)
+
+  const { webcamRef, videoConstraints } = useEmotion()
 
   return(
     // <BrowserRouter>
     
-    <>
-      <RegisterPage />
-    </>
-
-    // <Container> 
-    //   <Routes >
-        
-    //     {/* Home page */}
-    //     <Route 
-    //       path = '/home'
-    //       element = { <HomePage/> }
-    //     />
-
-    //     {/* Register page */}
-    //     <Route 
-    //       path = '/register'
-    //       element = {<RegisterPage/>}
-    //     />
-
-    //     {/* Login page */}
-    //     <Route 
-    //       path = '/login'
-    //       element = {<LoginPage/>}
-    //     />
-
-    //     <Route element = {<ProtectedRoutes />} >
-    //       {/* Emails page - only visible to logged in users */}
-    //       <Route 
-    //         path = '/'
-    //         element = {
-    //           <Emails/>
-    //         }
-    //       />
-
-    //       {/* Tasks page - only visible to logged in users */}
-    //       <Route 
-    //         path = '/tasks'
-    //         element = {
-    //           <Tasks/>
-    //         }
-    //       />
-    //     </Route>
-
-    //   </Routes>
-    // </Container>
-
-    // </BrowserRouter>
+    <Box>
+      <AppHeader toggleSidebar = {toggleSidebar} />
+      
+      <Box>
+        <SideBar openSidebar = {openSidebar} />
+        {/* Render all the children of the route wrapped in Suspense (because they are lazy loaded in the router.jsx file) */}
+        <Suspense fallback = {<Loader/>} >
+          <Outlet context = {{ openSidebar }} />
+        </Suspense>
+      </Box>
+      {/* <Webcam
+        ref = {webcamRef}
+        audio = {false}
+        screenshotFormat = 'image/jpeg'
+        videoConstraints = {videoConstraints}
+        // mirrored = {true}
+      /> */}
+    </Box>
 
     // Before
     // <div className = "App">
@@ -285,11 +267,11 @@ const App = () => {
     //     {/* <Emotions /> */}
     //     <div className = 'Camera'> 
     //     <Webcam 
-    //       ref = {webcamRef}
-    //       audio = {false}
-    //       screenshotFormat = 'image/jpeg'
-    //       videoConstraints = {videoConstraints}
-    //       // mirrored = {true}
+          // ref = {webcamRef}
+          // audio = {false}
+          // screenshotFormat = 'image/jpeg'
+          // videoConstraints = {videoConstraints}
+          // // mirrored = {true}
     //     />
     //     </div>
     //     <div>

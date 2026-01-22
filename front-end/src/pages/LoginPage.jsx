@@ -1,7 +1,31 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/AuthProvider'
 import Loader from '../customComponents/Loader'
+import Form from 'react-bootstrap/Form'
+// import Button from 'react-bootstrap/Button'
+import { useEffect } from 'react'
+import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
+import { House } from 'react-bootstrap-icons'
+
+const StyledCard = styled(Card) ({
+  padding: "20px 60px",   
+  backgroundColor: "#F4F4FF",
+  textAlign: "center", 
+  "& > button": {
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: "#42458A"
+  }
+})
+
+const FormContainer = styled(Box)({
+  marginBottom: 10,
+  "& > div": {
+    marginTop: 10,
+    // marginBottom: 10
+  }
+})
 
 /**
  * 
@@ -13,6 +37,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   const { login } = useAuth()
 
@@ -24,71 +49,119 @@ const LoginPage = () => {
     event.preventDefault() // prevent automatic refreshing
     setMessage("") // clear any previous message
     
+    if (email === "", password === ""){
+      setMessage("All fields must be filled before proceeding.")
+    }
+    else {
+      setLoading(true)
+      try {
+
+        // const {data, error} = await login(email, password)
+        const result = await login(email, password)
+
+        if (!result.success) setMessage(result.error)
+        if (result.success) {
+          navigate("/emails")
+          // navigate("/")
+          // console.log(data)
+        }
+          
+      } catch (error) {
+        // console.log(error.message)
+        setMessage(error.message)
+      } finally {
+        setLoading(false)
+      }
+
+    }
     // Clear the fields
     setEmail("")
     setPassword("")
-
-    try {
-      setLoading(true)
-  
-      const {data, error} = await login(email, password)
-      if (data) {
-        navigate("/emails")
-        // navigate("/")
-        // console.log(data)
-      }
-      if (error) setMessage(error)
-      
-      setLoading(false)
-      
-    } catch (error) {
-      // console.log(error.message)
-      setMessage(error.message)
-    }
 
   }
 
   // If loading display the loader otherwise the content
   return (loading 
-    ? (<Loader />)
+    ? (
+      <>
+        <Loader />
+      </>
+    )
     : (
-      <div>
-        <h2>Login</h2>
-        <br></br>
+      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+        <StyledCard>
+              <Typography variant = "h4" style = {{marginBottom: 10}}>Login</Typography>
+              <Link href = "/" style = {{alignSelf: "flex-start"}}>Home</Link>
 
-        <Link to = "/home" >Home</Link>
-        <br></br>
+            {/* If there is a message, display it */}
+            {message && <Typography color = "error">{message}</Typography>}
 
-        {/* If there is a message, display it */}
-        {message && <span>{message}</span>}
+            <FormContainer
+              // onSubmit = {handleSubmit}
+              // className = "text-start"
+            >
+              <TextField 
+                required
+                // id = "outlined-basic" 
+                label = "Emails address" 
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                // color = "secondary"
+                value = {email}
+                onChange = {(e) => setEmail(e.target.value)}
+              />
 
-        <form
-          onSubmit = {handleSubmit}
-        >
-          <input 
-            type = 'email' 
-            placeholder = 'Email' 
-            onChange = {(e) => setEmail(e.target.value)}
-            value = {email}
-            required
-          />
+              <TextField 
+                required
+                // id = "outlined-basic" 
+                label = "Password" 
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                // color = "secondary"
+                value = {password}
+                onChange = {(e) => setPassword(e.target.value)}
+              />
+              {/* <Form.Group className = "mb-3">
+                <Form.Label>Email address</Form.Label>
+                <Form.Control 
+                  type = 'email' 
+                  placeholder = 'Email' 
+                  onChange = {(e) => setEmail(e.target.value)}
+                  value = {email}
+                  required
+                />
+              </Form.Group> */}
+
+              {/* <Form.Group className = "mb-3">
+                <Form.Label>Password</Form.Label>
+                <Form.Control 
+                  type = 'password' 
+                  placeholder = 'Password' 
+                  onChange = {(e) => setPassword(e.target.value)}
+                  value = {password}
+                  required
+                />
+              </Form.Group> */}
+            </FormContainer>
+            
+            <Button 
+              onClick = {handleSubmit} 
+              variant = "contained" 
+              disabled = {loading} 
+              data-testid = "login-btn"
+            >
+              Login
+            </Button>
           
-          <input 
-            type = 'password' 
-            placeholder = 'Password' 
-            onChange = {(e) => setPassword(e.target.value)}
-            value = {password}
-            required
-          />
-
-          <button type = 'submit' data-testid = "login-btn" >
-            Login
-          </button>
-        </form>
-
-        <span>Don't have an account?</span>
-        <Link to = "/register">Register</Link>
-      </div>
+            <Typography>
+              Don't have an account yet? 
+              <Link href = "/register">Register</Link>
+            </Typography>
+          {/* </Card.Body> */}
+        </StyledCard>
+      </Box>
     )
   )
 }

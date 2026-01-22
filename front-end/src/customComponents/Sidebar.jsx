@@ -1,13 +1,62 @@
+import React from 'react'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Nav from 'react-bootstrap/Nav'
-import { PersonFill, PencilSquare, Archive, Send, Inbox, Trash3, FileEarmark, Check2Circle, ViewList } from 'react-bootstrap-icons'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Navbar from 'react-bootstrap/Navbar'
+// import Container from 'react-bootstrap/Container'
+import { PersonFill, PencilSquare, Archive, Send, Inbox, Trash3, FileEarmark, Check2Circle, ViewList, Display, CircleFill } from 'react-bootstrap-icons'
 import { useState } from 'react'
+import Offcanvas from 'react-bootstrap/Offcanvas'
 import ProfileModal from './ProfileModal'
 
+import { Drawer, Box, List, ListItem, styled, Button, Divider } from '@mui/material'
+import ComposeMail from './ComposeMail'
+import { useAuth } from '../hooks/AuthProvider'
+import { NavLink, useParams } from 'react-router-dom'
+import { routes } from '../constants/routes'
+import { SIDERBAR_CONTENT } from './sidebar.config'
 
-const SideBar = ({tasks = false}) => {
-    const [showModal, setShowModal] = useState(false)
+const Container = styled(Box) ({
+    padding: 8,
+    '& > ul': {
+        padding: '10px 0 0 5px',
+        fontSize: 15, 
+        fontWeight: 500,
+        cursor: "pointer",
+        "& > a": {
+            textDecoration: "none",
+            color: "inherit"
+        }
+    },
+    '& > ul > a > li > svg': {
+        marginRight: 10
+    }
+})
+
+const ComposeButton = styled(Box) ({
+    background: "#C2E7FF",
+    color: "#001D35",
+    padding: 15,
+    borderRadius: 16, 
+    minWidth: 130,
+    textTransform: "none",
+    cursor: "pointer"
+})
+
+const SideBar = ({tasks = false, openSidebar}) => {
+    const [openDialog, setOpenDialog] = useState(false)
+    const [openProfile, setOpenProfile] = useState(false)
+    const onComposeClick = () => setOpenDialog(true)
+    const onProfileClick = () => setOpenProfile(true)
+
+    const { type } = useParams()
+
+    const handleRecording = () => {
+        
+    }
+
     return (
         tasks 
         ? <Card style = {{ width: "4rem", border: "none", alignItems: "center" }}> 
@@ -20,64 +69,59 @@ const SideBar = ({tasks = false}) => {
                 <ListGroup.Item as = "li" ><Trash3 size = {25} /></ListGroup.Item>
             </ListGroup>
         </Card>
-        : <Card style = {{ width: "4rem", border: "none", alignItems: "center" }}>
-            {/* Keep a default colour for each link, on active change the bg colour */}
-            <Card.Body >
-                <Card.Link onClick = {() => setShowModal(true)}>
-                    <PersonFill color = "black" size = {25}  aria-label = "Profile" />
-                </Card.Link>
-                <ProfileModal
-                    show = {showModal}
-                    onHide = {() => setShowModal(false)}
-                />
-            </Card.Body>
+        : <Drawer 
+            anchor = "left" 
+            open = {openSidebar}
+            hideBackdrop 
+            ModalProps = {{keepMounted: true}}
+            variant = "persistent"
+            sx = {{
+                '& .MuiDrawer-paper': {
+                    marginTop: "64px",
+                    width: 150,
+                    background: "#F5F5F5",
+                    borderRight: "none",
+                    height: "calc(100vh = 64px)"
+                }
+            }}
+        >
+            <Container>
+                <ListItem onClick = {() => onProfileClick()}>
+                    <PersonFill color = "black" size = {20}  aria-label = "Profile" />
+                </ListItem>
 
-            <Card.Body >
-                <Card.Link>
-                    <PencilSquare color = "black" size = {25}  aria-label = "Compose" />
-                </Card.Link>
-            </Card.Body>
+                <ComposeButton onClick = {() => onComposeClick()}>
+                    <PencilSquare color = "black" size = {20}  aria-label = "Compose" style = {{marginRight: 10}} />
+                    Compose
+                </ComposeButton>
+                <List>
+                    { SIDERBAR_CONTENT.map(data => (
+                        <NavLink key = {data.name} to = {`${routes.emails.path}/${data.name}`}>
+                            <ListItem style = {type === data.name.toLowerCase() 
+                                ? {
+                                    backgroundColor: "#D3E3FD",
+                                    borderRadius: "0 16px 16px 0",
+                                } 
+                                : {}}
+                            >
+                                {data.icon}{data.title}
+                            </ListItem>
+                                
+                        </NavLink>
+                        ))
+                    }
+                </List>
 
-            <Card.Body style = {{borderRadius: "5px", backgroundColor: "lavender"}}>
-                <Card.Link href = "/emails" >
-                    <Inbox color = "black" size = {25}  aria-label = "Inbox" />
-                </Card.Link>
-            </Card.Body>
+                {/* Record button */}
+                <CircleFill size = {20} color = "green" onClick = {() => handleRecording()} style = {{marginTop: 50, marginLeft: 15, cursor: "pointer"}}  />
+                
+                {/* Profile modal - open when profile icon is clicked */}
+                <ProfileModal openProfile = {openProfile} setOpenProfile = {setOpenProfile} />
 
-            <Card.Body >
-                <Card.Link>
-                    <Send color = "black" size = {25} aria-label = "Sent" />
-                </Card.Link>
-            </Card.Body>
-
-            <Card.Body >
-                <Card.Link>
-                    <FileEarmark color = "black" size = {25}  aria-label = "Drafts" />
-                </Card.Link>    
-            </Card.Body>
-
-            <Card.Body >
-                <Card.Link>
-                    <Archive color = "black" size = {25}  aria-label = "Archive" />
-                </Card.Link>    
-            </Card.Body>
-
-            <Card.Body >
-                <Card.Link>
-                    <Trash3 color = "black" size = {25}  aria-label = "Trash" />
-                </Card.Link>    
-            </Card.Body>
-
-            {/* <ListGroup variant = "flush" as = "ul">
-                <ListGroup.Item as = "li" ><PersonFill size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" ><PencilSquare size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" style = {{borderRadius: "5px"}} active><Inbox size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" ><Send size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" ><FileEarmark size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" ><Archive size = {25} /></ListGroup.Item>
-                <ListGroup.Item as = "li" ><Trash3 size = {25} /></ListGroup.Item>
-            </ListGroup> */}
-        </Card>
+                {/* Compose mail modal - open when compose button is clicked */}
+                <ComposeMail openDialog = {openDialog} setOpenDialog = {setOpenDialog} />
+            </Container>
+        </Drawer>
         
     )
 }

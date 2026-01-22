@@ -11,7 +11,7 @@ const AuthContext = createContext({user: null})
  * 
  * @returns an Auth context provider to wrap the App component around
  */
-function AuthProvider ({children}) {
+const AuthProvider = ({children}) => {
     // const navigate = useNavigate()
     const [session, setSession] = useState(undefined)
     const [user, setUser] = useState(null)
@@ -31,6 +31,10 @@ function AuthProvider ({children}) {
         })
 
         
+        if (error) {
+            return {success: false, error: error.message}
+            // throw error
+        }
         // if (data?.user !== null) {
         if (data) {
             // console.log(data)
@@ -41,10 +45,6 @@ function AuthProvider ({children}) {
             return {success: true, data}
         }
         
-        if (error) {
-            return {success: false, error: error.message}
-            // throw error
-        }
     }
     
     /**
@@ -103,7 +103,7 @@ function AuthProvider ({children}) {
             setUser(currentUser ?? null)
             setAuthenticated(true)
             setLoading(false)
-            // console.log(data.user)
+            // console.log(data)
         }
         getUser()
 
@@ -111,6 +111,7 @@ function AuthProvider ({children}) {
         .then(
             ({data: {session}}) => {
                 setSession(session)
+                // console.log(session.user)
             }
         )
         
