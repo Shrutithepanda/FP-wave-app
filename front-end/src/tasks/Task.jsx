@@ -3,9 +3,8 @@ import { useEffect, useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
 import { routes } from "../constants/routes"
 import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
-import { EMAIL_API_URLS } from "../services/api.urls"
+import { EMAIL_API_URLS, TASK_API_URLS } from "../services/api.urls"
 import useApi from "../hooks/useApi"
-import ViewEmail from "./ViewEmail"
 
 const Wrapper = styled(Box) ({
     display: "flex",
@@ -28,14 +27,17 @@ const Wrapper = styled(Box) ({
     }
 })
 
-const Indicator = styled(Typography) ({
-    fontSize: "12px !important",
-    background: "#DDD",
+const Indicator = styled(Box) ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    fontSize: "14px !important",
     color: "#222",
-    padding: "0 4px",
-    borderRadius: 5,
-    marginRight: 6,
-    height: 20
+    padding: "0 7px",
+    textWrap: "nowrap",
+    borderRadius: "15px 0 0 15px",
+    height: 25,
+    width: "100px !important"
 })
 
 const Date = styled(Typography) ({
@@ -54,32 +56,48 @@ const StyledText = styled(Box) ({
     // color: "#424242"
 })
 
-const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) => {
+const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) => {
     const navigate = useNavigate()
-    const toggleHighPriorityService = useApi(EMAIL_API_URLS.toggleHighPriorityEmails)
-    const markAsReadService = useApi(EMAIL_API_URLS.markAsRead)
+    const [indicatorColor, setIndicatorColor] = useState("#CECECE")
+    const [barColor, setBarColor] = useState("#838282")
+    const toggleHighPriorityService = useApi(TASK_API_URLS.toggleHighPriorityProjects)
 
-    const toggleHighPriorityMails = () => {
-        toggleHighPriorityService.call({ id: email.id, priority: !email.priority, type: type })
+    const toggleHighPriorityTasks = () => {
+        toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
         setRefresh(prevState => !prevState)
         window.location.reload()
     }
 
-    const markEmailAsRead = () => {
-        markAsReadService.call({ id: email.id, read: !email.read })
-    }
-
     const onValueChange = () => {
         // If selected emails already contain this email then filter this one out of the selected emails
-        if (selectedEmails.includes(email.id)) {
-            setSelectedEmails(prevState => prevState.filter(id => id != email.id))
+        if (selectedTasks.includes(project.id)) {
+            setSelectedTasks(prevState => prevState.filter(id => id != project.id))
         }
         // If selected emails do not have this email, append this email to the selected emails
         else {
-            setSelectedEmails(prevState => [...prevState, email.id])
+            setSelectedTasks(prevState => [...prevState, project.id])
 
         }
     }
+
+    const changeIndicatorColor = () => {
+        if (project.status === "In progress") {
+            setIndicatorColor("#B0CAF3")
+            setBarColor("#5688d8")
+        }
+        if (project.status === "Completed") {
+            setIndicatorColor("#95DBB6")
+            setBarColor("#47966c")
+        }
+        if (project.status === "Pending") {
+            setIndicatorColor("#fca9aa")
+            setBarColor("#cf6567")
+        }
+    }
+
+    useEffect(() => {
+        changeIndicatorColor()
+    }, [type])
 
     return (
         <Wrapper
@@ -88,14 +106,14 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
             <Checkbox 
                 size = "small" 
                 // checked if the id value exists in the array - selectedEmails
-                checked = {selectedEmails.includes(email.id)} 
+                checked = {selectedTasks.includes(project.id)} 
                 onChange = {() => onValueChange()}
             />
-            {email.priority === true
-                ? <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
+            {project.priority === true
+                ? <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
                     <BookmarkFill size = {20} color = "#7578BD" style = {{flexShrink: 0}} />
                 </IconButton>
-                : <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
+                : <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
                     <Bookmark size = {20} style = {{flexShrink: 0}} />
                 </IconButton>
             }
@@ -105,11 +123,10 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                     // Route to ViewEmail component path
                     () => {
                         navigate(
-                            routes.view_email.path, 
+                            routes.view_task.path, 
                             // Share the email with the component
-                            {state: {email: email}}
+                            {state: {project: project}}
                         )
-                        markEmailAsRead()
                     }
                 }
                 sx = {{
@@ -125,17 +142,21 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                 }}
             >
                 <Box sx = {{width: "100%", minWidth: 0, display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <Typography sx = {{color: email.read ? "#424242" : "black"}}>{email.send_to}</Typography>
+                        <Typography>{project.title}</Typography>
                         <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
-                            { email.read 
-                                ? <></>
-                                : <CircleFill size = {10} color = "#E87476" style = {{marginRight: 10}} />
-                            }
                             <Date>
-                                {(new window.Date(email.created_at)).getDate()}&nbsp;
-                                {(new window.Date(email.created_at)).toLocaleDateString("default", {month: "short"})}, &nbsp;
-                                {(new window.Date(email.created_at)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
+                                {(new window.Date(project.due_date)).getDate()}&nbsp;
+                                {(new window.Date(project.due_date)).toLocaleDateString("default", {month: "short"})}, &nbsp;
+                                {(new window.Date(project.due_date)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
                             </Date>
+                            <Indicator
+                                sx = {{backgroundColor: indicatorColor, borderRight: `0px solid ${barColor}`}}
+                            >
+                                {/* <CircleFill size = {10} color = {circleColor} style = {{marginRight: 5}} /> */}
+                                <Typography>
+                                    {project.status}
+                                </Typography>
+                            </Indicator>
                         </Box>
                     </Box>
 
@@ -146,7 +167,6 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                             overflow: "hidden",
                         }}
                     >
-                        {/* <Indicator>Inbox</Indicator> */}                        
                         <Box>
                             <Typography 
                                 sx = {{
@@ -154,10 +174,9 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
                                     fontWeight: "normal", 
-                                    color: email.read ? "#424242" : "black"
                                 }}
                             >
-                                {email.subject} {email.email_body && "-"} {email.email_body}
+                                {project.description}
                             </Typography>                            
                         </Box>
                     </StyledText>
@@ -166,4 +185,4 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
     )
 }
 
-export default Email
+export default Task

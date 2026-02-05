@@ -1,11 +1,13 @@
-import { Box, styled, Typography } from "@mui/material"
-import { Arrow90degLeft, ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, CaretLeft, PersonCircle, Trash3 } from "react-bootstrap-icons"
+import { Box, IconButton, styled, Typography } from "@mui/material"
+import { Arrow90degLeft, ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, CaretLeft, CircleFill, PersonCircle, PlusCircle, Trash3 } from "react-bootstrap-icons"
 import { useLocation, useOutletContext } from "react-router-dom"
 import { useAuth } from "../hooks/AuthProvider"
 import useApi from "../hooks/useApi"
-import { EMAIL_API_URLS } from "../services/api.urls"
+import { EMAIL_API_URLS, TASK_API_URLS } from "../services/api.urls"
 import { useEmotion } from "../hooks/EmotionProvider"
 import { useEffect } from "react"
+import { useState } from "react"
+import ComposeTask from "../customComponents/ComposeTask"
 
 const IconWrapper = styled(Box) ({
     padding: 20,
@@ -14,7 +16,7 @@ const IconWrapper = styled(Box) ({
     justifyContent: "space-between"
 })
 
-const Subject = styled(Typography) ({
+const Subject = styled(Box) ({
     fontSize: 22,
     margin: "10px 0 20px 65px",
     display: "flex",
@@ -22,13 +24,17 @@ const Subject = styled(Typography) ({
 })
 
 const Indicator = styled(Box) ({
-    fontSize: 13,
-    backgroundColor: "#E8E8E8",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "14px !important",
     color: "#222",
-    padding: "2px 4px",
-    marginLeft: 6,
-    borderRadius: 5,
-    alignSelf: "center"
+    padding: "0 7px",
+    margin: "0 10px",
+    textWrap: "nowrap",
+    borderRadius: 20,
+    height: 25,
+    width: "110px !important"
 })
 
 const Container = styled(Box) ({
@@ -49,25 +55,31 @@ const Date = styled(Box) ({
     color: "#5E5E5E"
 })
 
-const ViewEmail = () => {
+const ViewTask = () => {
+    const [indicatorColor, setIndicatorColor] = useState("#CECECE")
+    const [circleColor, setCircleColor] = useState("#838282")
+
+    const [openDialog, setOpenDialog] = useState(false)
+    const createNewTask = () => setOpenDialog(true)
+
     const { openSidebar } = useOutletContext()
 
     const { stressed } = useEmotion()
 
     // Extract the email from the router's state
     const { state } = useLocation()
-    const { email } = state
+    const { project } = state
 
-    const moveEmailsToTrashService = useApi(EMAIL_API_URLS.moveEmailsToTrash)
-    const toggleHighPriorityService = useApi(EMAIL_API_URLS.toggleHighPriorityEmails)
+    const moveProjectToTrashService = useApi(TASK_API_URLS.moveProjectToTrash)
+    const toggleHighPriorityService = useApi(TASK_API_URLS.toggleHighPriorityProjects)
 
     const deleteEmail = () => {
-        moveEmailsToTrashService.call([email.id])
+        moveProjectToTrashService.call([project.id])
         window.history.back()
     }
 
     const toggleHighPriorityMails = () => {
-        toggleHighPriorityService.call({ id: email.id, priority: !email.priority })
+        toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
         // setRefresh(prevState => !prevState)
         window.location.reload()
     }
@@ -75,6 +87,25 @@ const ViewEmail = () => {
     const handleRefresh = () => {
         window.location.reload()
     }
+
+    const changeIndicatorColor = () => {
+        if (project.status === "In progress") {
+            setIndicatorColor("#B0CAF3")
+            setCircleColor("#5688d8")
+        }
+        if (project.status === "Completed") {
+            setIndicatorColor("#95DBB6")
+            setCircleColor("#47966c")
+        }
+        if (project.status === "Pending") {
+            setIndicatorColor("#fca9aa")
+            setCircleColor("#cf6567")
+        }
+    }
+
+    useEffect(() => {
+        changeIndicatorColor()
+    }, [])
 
     return (
         <Box style = {
@@ -109,11 +140,16 @@ const ViewEmail = () => {
             </IconWrapper>
 
             <Subject>
-                {email.subject}
+                {project.title}
                 
-                <Indicator component = "span" >{email.folder}</Indicator>
+                <Indicator 
+                    sx = {{backgroundColor: indicatorColor}} 
+                >
+                    <CircleFill size = {10} color = {circleColor} style = {{marginRight: 5}} />
+                    {project.status}
+                    </Indicator>
                 
-                {email.priority === true
+                {project.priority === true
                     ? <BookmarkFill size = {20} color = "#7578BD" style = {{marginLeft: 10, cursor: "pointer"}} onClick = {() => toggleHighPriorityMails()} />
                     : <Bookmark size = {20} style = {{marginLeft: 10, cursor: "pointer"}} onClick = {() => toggleHighPriorityMails()} />
                 }
@@ -122,26 +158,31 @@ const ViewEmail = () => {
                 </span>
             </Subject>
             <Box style = {{display: "flex"}} >
-                <PersonCircle size = {30} color = "#79747E" style = {{margin: "8px 5px 0 20px"}} />
                 <Container>
                     <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
-                        <Typography style = {{marginTop: 10, fontWeight: "bold"}} >
-                            {email.name}
-                            <Box component = "span" style = {{fontWeight: "normal"}}>&nbsp; - &nbsp;{email.send_to}</Box>
-                            {/* <Box component = "span" style = {{fontWeight: "normal"}}>&nbsp;&#60;{email.send_to}&#62;</Box> */}
+                        <Typography style = {{marginTop: 10, marginLeft: 50}} >
+                            {project.description}
                         </Typography>
                         <Date>
-                            {(new window.Date(email.created_at)).getDate()}&nbsp;
-                            {(new window.Date(email.created_at)).toLocaleDateString("default", {month: "short"})}&nbsp;
-                            {(new window.Date(email.created_at)).getFullYear()},&nbsp;
-                            {(new window.Date(email.created_at)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
+                            {(new window.Date(project.due_date)).getDate()}&nbsp;
+                            {(new window.Date(project.due_date)).toLocaleDateString("default", {month: "short"})}&nbsp;
+                            {(new window.Date(project.due_date)).getFullYear()},&nbsp;
+                            {(new window.Date(project.due_date)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
                         </Date>
                     </Box>
-                    <Typography style = {{marginTop: 20, marginRight: 30}} >{email.email_body}</Typography>
                 </Container>
             </Box>
+
+            <Box sx = {{marginLeft: 8}}>
+                <Typography style = {{marginTop: 20}} >Tasks come here</Typography>
+                <IconButton>
+                    <PlusCircle size = {25} color = "#79747E" onClick = {() => createNewTask()} />
+                </IconButton>
+            </Box>
+
+            <ComposeTask openDialog = {openDialog} setOpenDialog = {setOpenDialog} />
         </Box>
     )
 }
 
-export default ViewEmail
+export default ViewTask

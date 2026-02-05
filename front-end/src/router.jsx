@@ -25,34 +25,24 @@ export const router = createBrowserRouter(
             <Route path =  "/register" element = {<RegisterPage/>} />
 
             {/* Route to inbox by default from the address in the URL */}
-            <Route path = {routes.main.path} element = {<Navigate to = {`${routes.main.path}/inbox`}/>} />
+            <Route path = {routes.emails_tab.path} element = {<Navigate to = {`${routes.emails_tab.path}/inbox`}/>} />
             
-            <Route path = {routes.main.path} element = {routes.main.element}>
-                {/* Child routes */}
+            <Route path = {routes.emails_tab.path} element = {routes.emails_tab.element}>
+                {/* Child routes for emails */}
                 <Route path = {`${routes.emails.path}/:type`} element = {routes.emails.element} errorElement = {<ErrorComponent/>} />
-                <Route path = {routes.view.path} element = {routes.view.element} errorElement = {<ErrorComponent/>} />
+                <Route path = {routes.view_email.path} element = {routes.view_email.element} errorElement = {<ErrorComponent/>} />
             </Route>
 
-            <Route path = "/tasks" element = {<Tasks/>} />
+            <Route path = {routes.tasks_tab.path} element = {<Navigate to = {`${routes.tasks.path}/projects`}/>} />
+            
+            <Route path = {routes.tasks_tab.path} element = {routes.tasks_tab.element}>
+                {/* Child routes for tasks */}
+                <Route path = {`${routes.tasks.path}/:type`} element = {routes.tasks.element} errorElement = {<ErrorComponent/>} />
+                <Route path = {routes.view_task.path} element = {routes.view_task.element} errorElement = {<ErrorComponent/>} />
+            </Route>
 
-            <Route path = {routes.invalid.path} element = {<Navigate to = {`${routes.main.path}/inbox`} />} />
+            <Route path = {routes.invalid.path} element = {<Navigate to = {`${routes.emails_tab.path}/inbox`} />} />
         </Route>
 
     )
 )
-
-// export const router = createBrowserRouter([
-//     {path: "/", element: <HomePage/>},
-//     {path: "/login", element: <LoginPage/>},
-//     {path: "/register", element: <RegisterPage/>},
-//     {path: "/emails", element: 
-//         <ProtectedRoutes>
-//             <Emails/>
-//         </ProtectedRoutes>
-//     },
-//     {path: "/tasks", element: 
-//         <ProtectedRoutes>
-//             <Tasks/>
-//         </ProtectedRoutes>
-//     },
-// ])

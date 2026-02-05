@@ -15,26 +15,20 @@ import EmotionProvider from './hooks/EmotionProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  // Mounts things two times - so could be temporarily disabled. Also to prevent calling emotion API too frequently.
   <React.StrictMode>
 
-    <AuthProvider>
-      <EmotionProvider>
+    <EmotionProvider>
+      <AuthProvider>
         {/* Fallback to a screen showing loader */}
         <Suspense fallback = {<Loader/>} >
           {/* Provide routes */}
           <RouterProvider router = {router} />
         </Suspense>
-      </EmotionProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </EmotionProvider>
     
   </React.StrictMode>
-  // <React.StrictMode>
-  //   <BrowserRouter>
-  //     <AuthProvider>
-  //       <App />
-  //     </AuthProvider>
-  //   </BrowserRouter>
-  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -19,46 +19,46 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(express.json({ limit: "5mb" }));
 
-// router for handling routes related to the email api 
+// router for handling routes related to the APIs
 app.use("/", routes)
 
 const port = process.env.PORT;
 
-const aws_rekognition = new RekognitionClient({
-  // region: process.env.AWS_REGION || "us-east-1",
-  region: process.env.AWS_REGION,
-});
+// const aws_rekognition = new RekognitionClient({
+//   // region: process.env.AWS_REGION || "us-east-1",
+//   region: process.env.AWS_REGION,
+// });
 
 // console.log("AWS key loaded:", !!process.env.AWS_ACCESS_KEY_ID);
 
 // app.post("/emotion_detection_json/:id", async (req, res) => { // alternative
-app.post("/emotion_detection_api", async (req, res) => { // original
+// app.post("/detect-emotions", async (req, res) => { // original
   // Getting AWS rekognition's response for emotions detected and sending to the front-end
   
-  try {
-    const buffer = Buffer.from(req.body.image, "base64");
+  // try {
+  //   const buffer = Buffer.from(req.body.image, "base64");
 
-    const command = new DetectFacesCommand({
-      Image: { Bytes: buffer },
-      Attributes: ["EMOTIONS"],
-      // Attributes: ["ALL"],
-    });
+  //   const command = new DetectFacesCommand({
+  //     Image: { Bytes: buffer },
+  //     Attributes: ["EMOTIONS"],
+  //     // Attributes: ["ALL"],
+  //   });
 
-    const result = await aws_rekognition.send(command);
-    const emotions = result.FaceDetails?.[0]?.Emotions || [];
+  //   const result = await aws_rekognition.send(command);
+  //   const emotions = result.FaceDetails?.[0]?.Emotions || [];
     
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ emotions });
+  //   res.setHeader("Content-Type", "application/json");
+  //   res.status(200).json({ emotions });
 
-    // console.log(JSON.stringify(emotions, null, 2))
+  //   // console.log(JSON.stringify(emotions, null, 2))
     
-  } catch (err) {
+  // } catch (err) {
     
-    console.error(err);
-    res.setHeader("Content-Type", "application/json");
-    res.status(500).json({ error: "Emotion detection failed" });
+  //   console.error(err);
+  //   res.setHeader("Content-Type", "application/json");
+  //   res.status(500).json({ error: "Emotion detection failed" });
 
-  }
+  // }
 
   // Alternative: Read values from the json file and send to front-end
   // const id = req.params.id
@@ -81,7 +81,7 @@ app.post("/emotion_detection_api", async (req, res) => { // original
 
 
   // console.log(data)
-});
+// });
 
 // Routes
 
@@ -100,62 +100,6 @@ app.get('/inbox', async (_, res) => {
       return res.send({ error })
   }
 });
-
-// Fetch mails from the emails table with the given id
-// app.get("/emails/:id", async (req, res) => {
-//   console.log(req.params)
-//   // ⚠️ Implement using type to show in folders
-//   try {
-    // const { data, error } = await supabase
-    // .from("Emails")
-    // .select()
-    // .eq("id", req.params.id)
-
-    // return res.send(data)
-
-//   } catch (error) {
-//     return res.send({ error })
-//   }
-// })
-
-// // Create a mail item in the Emails table (Sent tab)
-// // app.post("/create_email", async (req, res) => {
-// app.post("/emails/save", async (req, res) => {
-//   try {
-//     // console.log(req.body)
-//     const { data, error } = await supabase
-//     .from("Emails")
-//     .insert(req.body)
-  
-//     if(error) return res.status(400).json(error)
-//     res.status(200).json(req.body)
-
-//   } catch (error) {
-//     return res.send({ error })
-//   }
-// })
-
-// // Delete a mail item from the Inbox table (Delete tab)
-// app.delete("/emails/:id", async (req, res) => {
-//   // ⚠️ Check how to delete multiple, from emails/inbox table
-//   try {
-//     const { data, error } = await supabase
-//     .from("Inbox")
-//     .delete()
-//     .eq(":id", req.params.id)
-
-//     // Refetch data without the deleted item
-//     const { newData, newError } = await supabase
-//     .from("Inbox")
-//     .select("*")
-
-//     if (error) return res.status(400).json(error)
-//     return res.send(newData)
-
-//   } catch (error) {
-//     return res.send({ error })
-//   }
-// })
 
 app.get('/tasks', (req, res) => {
   // Hard coded dummy task data

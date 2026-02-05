@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react' 
-import { Routes, Route, Outlet } from "react-router-dom"
+import { Routes, Route, Outlet, useParams, useLocation } from "react-router-dom"
 import supabase from '../supabase/supabaseClient'
 import { useAuth } from '../hooks/AuthProvider'
 
@@ -13,7 +13,6 @@ import ProtectedRoutes from '../pages/ProtectedRoutes'
 
 import Emails from '../emails/Emails'
 import Tasks from '../tasks/Tasks'
-import Emotions from '../emotions/Emotions'
 import AuthProvider from '../hooks/AuthProvider'
 import Container from 'react-bootstrap/esm/Container'
 import AppHeader from '../customComponents/AppHeader'
@@ -234,28 +233,29 @@ const App = () => {
   const [openSidebar, setOpenSidebar] = useState(true)  
   const toggleSidebar = () => setOpenSidebar(prevState => !prevState)
 
-  const { webcamRef, videoConstraints } = useEmotion()
+  // const { webcamRef, videoConstraints, videoRef } = useEmotion()
+  const { stressed, camOn } = useEmotion()
 
+  // Use location to see if to return emails or tasks pages
+  // const location = useLocation()
+  // useEffect(() => {
+  //   console.log(location.pathname)
+  // }, [])
   return(
     // <BrowserRouter>
     
     <Box>
       <AppHeader toggleSidebar = {toggleSidebar} />
+      {/* <AppHeader toggleSidebar = {toggleSidebar} shadowColor = {stressed ? "lightgreen" : "#F5F5F5"} /> */}
       
       <Box>
         <SideBar openSidebar = {openSidebar} />
+        {/* <SideBar openSidebar = {openSidebar} shadowColor = {stressed ? "lightgreen" : "#F5F5F5"} /> */}
         {/* Render all the children of the route wrapped in Suspense (because they are lazy loaded in the router.jsx file) */}
         <Suspense fallback = {<Loader/>} >
           <Outlet context = {{ openSidebar }} />
         </Suspense>
       </Box>
-      {/* <Webcam
-        ref = {webcamRef}
-        audio = {false}
-        screenshotFormat = 'image/jpeg'
-        videoConstraints = {videoConstraints}
-        // mirrored = {true}
-      /> */}
     </Box>
 
     // Before
@@ -266,13 +266,13 @@ const App = () => {
     //   <div className = 'Camera-emotion-container'>
     //     {/* <Emotions /> */}
     //     <div className = 'Camera'> 
-    //     <Webcam 
-          // ref = {webcamRef}
-          // audio = {false}
-          // screenshotFormat = 'image/jpeg'
-          // videoConstraints = {videoConstraints}
-          // // mirrored = {true}
-    //     />
+        // <Webcam 
+        //   ref = {webcamRef}
+        //   audio = {false}
+        //   screenshotFormat = 'image/jpeg'
+        //   videoConstraints = {videoConstraints}
+        //   // mirrored = {true}
+        // />
     //     </div>
     //     <div>
     //       {!camOn 

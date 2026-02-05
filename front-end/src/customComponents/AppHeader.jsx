@@ -1,59 +1,123 @@
 import React, { useEffect, useState } from 'react'
+import './AppHeader.css'
 import Container from 'react-bootstrap/Container'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-
-import { Search, List, Envelope, ListNested, Camera } from 'react-bootstrap-icons'
-import { AppBar, Toolbar, styled, InputBase, Box, Typography, IconButton, Menu, MenuItem, Link } from '@mui/material'
+import PropTypes from 'prop-types'
+import { Search, List, Envelope, ListNested, Camera, ArrowClockwise, BorderBottom, Border } from 'react-bootstrap-icons'
+import { AppBar, Toolbar, styled, InputBase, Box, Typography, IconButton, Menu, MenuItem, Link, ToggleButton, ToggleButtonGroup, Tabs, Tab } from '@mui/material'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
+import { useEmotion } from '../hooks/EmotionProvider'
+import { NavLink, Router, useLocation, useNavigate } from 'react-router-dom'
 
 const StyledAppBar = styled(AppBar) ({
-    background: "#F5F5F5",
+    background: "#F0F0F0",
     boxShadow: 'none',
-    width: "100vw"
+    width: "100vw",
+    height: 70,
 })
 
 const SearchWrapper = styled(Box) ({
-    backgroundColor: "#cfe8f8",
-    // marginLeft: 40,
+    backgroundColor: "#FFF",
     borderRadius: 20,
-    // minWidth: 400,
-    // maxWidth: 620,
     height: 48, 
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "0 20px",
     '& > div': {
-        // width: "100%",
+        width: "100%",
         padding: "0 5px"
     }
 })
 
 const TabsWrapper = styled(Box) ({
-    // width: "55%",
+// const TabsWrapper = styled(Tabs) ({
+    width: "15%",
+    height: 50,
     display: "flex",
-    justifyContent: "end",
+    marginRight: 20,
+    background: "#ddd8d8",
+    border: "0.5px solid #838383",
+    borderRadius: 45,
+
     '& > a': {
-        marginLeft: 20,
-        cursor: "pointer"
+        width: "50%",
+        height: "100%",
+        textDecoration: "none",
+        color: "black",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 45,
+        // ⚠️ Only stays active for inbox, and projects pages, not others
+        "&.active": {
+            background: "#DDDDEE",
+            border: "0.5px solid #7578BD"
+            // boxShadow: "0 0 5px 3px #BFC0F7 inset",
+        }
     }
+})
+
+const StyledCameraContainer = styled(Box) ({
+    display: "flex", 
+    alignItems: "center", 
+    borderRadius: 20, 
+    padding: 8, 
+    marginRight: 10,
 })
 
 /**
  * 
- * @returns a `NavBar` bootstrap component with contents: Search bar, __, Emails/Tasks buttons
+ * @returns a NavBar component with contents: Sidebar toggle button, camera icon, search bar, Emails/Tasks buttons
 */
-const AppHeader = ({toggleSidebar}) => {  
+const AppHeader = ({ toggleSidebar }) => {  
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [tab, setTab] = useState("emails")  
     const [search, setSearch] = useState("")  
 
     const SearchItem = () => {
         setSearch("")
     }
+
+    const { camOn, startCapturing, stopCapturing, stressed } = useEmotion()
+
+    const handleRecording = () => {
+        if (!camOn) startCapturing()
+        else stopCapturing()
+    }
+
+    const routes = {
+        0: "/emails",
+        1: "/tasks"
+    }
+
+    const tabs = {
+        "/emails": "0",
+        "/tasks": "1"
+    }
+
+    const currentTab = tabs[location.pathname] || "0"
+    // const [tab, setTab] = useState("0")
+
+    const handleTabChange = (event, changedTab) => {
+        setTab(changedTab)
+        navigate(tabs[changedTab])
+    }
+
+    useEffect(() => {
+        // console.log("AppHeader, stressed: ", stressed)
+    }, [stressed])
+
     return (
-        <StyledAppBar position = '' sx = {{ flexGrow: 1 }}>
-            <Toolbar style = {{display: 'flex', flexDirection: "row"}}>
+        <StyledAppBar 
+            position = '' 
+            sx = {{ flexGrow: 1 }}
+        >
+            <Toolbar style = {{ display: 'flex', flexDirection: "row" }}>
                 <IconButton
                     size = "large"
                     edge = "start"
@@ -79,13 +143,19 @@ const AppHeader = ({toggleSidebar}) => {
                 {/* <img src = {app_logo} alt = "logo" style = {{width: 100, marginLeft: 15}} /> */}
 
                 <Box style = {{display: "flex", flexDirection: "row", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
-                    <Box style = {{display: "flex", alignItems: "center", backgroundColor: "lightgreen", borderRadius: 20, padding: 8, marginRight: 10}}>
-                    <Camera color = 'inherit' size = {20} />
-                    </Box>
-                    <SearchWrapper>
+                    <StyledCameraContainer onClick = {handleRecording} style = {camOn ? {backgroundColor: "lightgreen"} : {backgroundColor: "lightgray"}}>
+                        <Camera color = 'inherit' size = {20} />
+                    </StyledCameraContainer>
+
+                    <SearchWrapper 
+                        style = {{
+                            boxShadow: `0px 1px 7px 1px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`,
+                            transition: 'box-shadow 0.5s ease-in'
+                        }}
+                    >
                         <InputBase 
                             placeholder = "Search" 
-                            sx = {{ minWidth: { xs: 50, sm: 400, md: 500 } }} 
+                            sx = {{ minWidth: { xs: 50, sm: 200, md: 500 } }} 
                             value = {search}
                             onChange = {(e) => setSearch(e.target.value)}
                         />
@@ -93,49 +163,26 @@ const AppHeader = ({toggleSidebar}) => {
                     </SearchWrapper>
                 </Box>
 
-                <TabsWrapper>
-                    <Link href = "/emails/inbox">
-                        <Envelope color = "black" size = {20} aria-label = "Emails tab" />
-                    </Link>
+                <TabsWrapper
+                    sx = {{
+                        // boxShadow: `1px 0px 5px 1px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+                        // transition: 'box-shadow 0.5s ease-in',
+                    }}
+                >
+                    <NavLink
+                        to = "/emails/inbox" 
+                    >
+                        Emails
+                    </NavLink>
 
-                    <Link href = "/tasks">
-                        <ListNested color = "black" size = {20} aria-label = "Tasks tab" />
-                    </Link>
+                    <NavLink
+                        to = "/tasks/projects" 
+                    >
+                        Tasks
+                    </NavLink>
                 </TabsWrapper>
             </Toolbar>
         </StyledAppBar>
-        
-        // <Navbar collapseOnSelect expand = "md" bg = "light" className = "fixed-to p-3 d-flex justify-content-between">
-        //     <Navbar.Brand href = "/emails">Wave</Navbar.Brand>
-        //     <Navbar.Toggle aria-controls = "responsive-navbar-nav" />
-        //     <Navbar.Collapse id = "responsive-navbar-nav" className = "">
-        //         <Container className = "d-flex justify-content-around ">
-        //         <Form className = "d-flex w-50 align-self-center" style = {{width: "0vw"}}>
-        //             <Form.Control
-        //                 type = "search"
-        //                 placeholder = "Search"
-        //                 className = "me-1"
-        //                 aria-label = "Search"
-        //             />
-        //             <Button variant = "outline-secondary" style = {{border: "none"}} ><Search size = {20} /></Button>
-        //         </Form>
-
-        //         {/* <div>
-        //             <p>Filter tags</p>
-        //         </div> */}
-
-        //         {/* PROBLEM: Even after switching tabs the Emails tab remains underlined */}
-        //         <Nav variant = "underline" className = "justify-content-end" defaultActiveKey = "/emails">
-        //             <Nav.Item>
-        //                 <Nav.Link href = "/emails">Emails</Nav.Link>
-        //             </Nav.Item>
-        //             <Nav.Item>
-        //                 <Nav.Link eventKey = "tasks" href = "/tasks">Tasks</Nav.Link>
-        //             </Nav.Item>
-        //         </Nav>
-        //         </Container>
-        //     </Navbar.Collapse>
-        // </Navbar>
     )
 }
 

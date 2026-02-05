@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import supabase from '../supabase/supabaseClient'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
+import { ArrowClockwise, Trash3 } from 'react-bootstrap-icons'
+import { Box, Checkbox, IconButton, List } from '@mui/material'
 
-import AppHeader from '../customComponents/AppHeader'
-import Loader from '../customComponents/Loader'
-import SideBar from '../customComponents/Sidebar'
-import { useAuth } from '../hooks/AuthProvider'
-
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import { Square, Trash3 } from 'react-bootstrap-icons'
-import { Box, Checkbox, List } from '@mui/material'
 import Email from './Email'
-import useApi from '../hooks/useApi'
-import { API_URLS } from '../services/api.urls'
 import NoMails from './NoMails'
+
+import useApi from '../hooks/useApi'
+import { useAuth } from '../hooks/AuthProvider'
+import { useEmotion } from '../hooks/EmotionProvider'
+
+import { EMAIL_API_URLS } from '../services/api.urls'
 import { EMPTY_TABS } from '../constants/empty_tabs'
 
 const Emails = () => {
@@ -26,19 +21,19 @@ const Emails = () => {
 
     const [selectedEmails, setSelectedEmails] = useState([])
     const [refresh, setRefresh] = useState(false)
-    
     const [loading, setLoading] = useState(false)
+    
     const { openSidebar } = useOutletContext(true)
+    const { type } = useParams()
 
     const { user, session, access_token } = useAuth()
+    const { stressed } = useEmotion()
 
     // console.log(session)
 
-    const { type } = useParams()
-
-    const getEmailsService = useApi(API_URLS.getEmailFromType)
-    const moveEmailsToTrashService = useApi(API_URLS.moveEmailsToTrash)
-    const deleteEmailService = useApi(API_URLS.deleteEmail)
+    const getEmailsService = useApi(EMAIL_API_URLS.getEmailFromType)
+    const moveEmailsToTrashService = useApi(EMAIL_API_URLS.moveEmailsToTrash)
+    const deleteEmailService = useApi(EMAIL_API_URLS.deleteEmail)
 
     // How to refresh when emails are sent from the sent page, composeMail
     useEffect(() => { 
@@ -47,34 +42,6 @@ const Emails = () => {
         getEmailsService.call({}, type, user.id)
 
         setLoading(false)
-        // .then(
-        //     setEmailData(getEmailsService.response)
-        // )
-        // fetch("/inbox")
-        // .then(
-        //     response => response.json()
-            
-        // )
-        // .then(
-        //     data => {
-        //         setEmailData(data)
-        //         // ----- Should this be somewhere else? -----
-        //         for (const d of data) {
-        //             // console.log(d)
-        //             setTags(d.tags)
-        //             setRead(d.read)
-        //         }
-        //     }
-        // )
-
-        // Type - Sent
-        // Type - Drafts
-        // Type - Archives
-
-        // Type - Trash -> in the function later
-        // For deleting by selecting all from a folder, multiple items should be moved to
-        // trash folder and removed from the folder they were in
-
     }, [type, refresh])
 
     // For checkbox at the top of the container
@@ -104,15 +71,52 @@ const Emails = () => {
         setRefresh(prevState => !prevState)
     }
 
+    const handleRefresh = () => {
+        window.location.reload()
+    }
+
     return (
-        <div>
-            <Box style = {openSidebar ? {marginLeft: 150, width: "calc(100% - 150px)"} : {width: "100%"}}>
+        <Box>
+            <Box style = {
+                    openSidebar 
+                    ? {
+                        marginLeft: 158, 
+                        marginRight: 30,
+                        width: "calc(100% - 188px)",  // -158 px for sidebar's width + space for shadow, marginLeft prev. -> 150
+                        height: "calc(100vh - 70px)", // -70px for header's height,
+                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+                        transition: 'box-shadow 0.5s ease-in',
+                        borderTopLeftRadius: 25,
+                        borderTopRightRadius: 25,
+                        background: "#F9F9F9",
+                    } 
+                    : {
+                        marginLeft: 30, 
+                        marginRight: 30,
+                        width: "calc(100% - 60px)", 
+                        height: "calc(100vh - 70px)",
+                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+                        transition: 'box-shadow 0.5s ease-in',
+                        borderTopLeftRadius: 25,
+                        borderTopRightRadius: 25,
+                        background: "#F9F9F9"
+                    }
+                }
+            >
                 <Box style = {{padding: "20px 10px 0 10px", display: "flex", alignItems: "center"}} >
                     <Checkbox size = "small" onChange = {(e) => selectAllEmails(e)} />
-                    <Trash3 style = {{cursor: "pointer"}} onClick = {() => deleteSelectedEmails()} />
+                    <IconButton size = "small" onClick = {() => deleteSelectedEmails()}>
+                        <Trash3 color = "black" />
+                    </IconButton>
+                    <span style = {{marginLeft: "auto", marginRight: 20}}>
+                        <IconButton size = "small" onClick = {handleRefresh} >
+                            <ArrowClockwise color = "black" />
+                        </IconButton>
+                    </span>
                 </Box>
+                
                 <List>
-                        {getEmailsService?.response?.map((email, index) => (
+                    {getEmailsService?.response?.map((email, index) => (
                         <Email 
                             key = {index} 
                             email = {email} 
@@ -129,11 +133,8 @@ const Emails = () => {
                         message = {EMPTY_TABS[type]}
                     />
                 }
-                {/* {loading
-                    ? <Loader /> : <></>
-                } */}
             </Box>
-        </div>
+        </Box>
     )
 }
 

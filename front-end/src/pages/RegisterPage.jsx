@@ -81,7 +81,7 @@ const RegisterPage = () => {
         </>
       )
     : (
-      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
         <StyledCard>
           <Typography variant = "h4" style = {{marginBottom: 10}}>Register</Typography>
           <Link href = "/" >Home</Link>

@@ -88,7 +88,7 @@ const LoginPage = () => {
       </>
     )
     : (
-      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
         <StyledCard>
               <Typography variant = "h4" style = {{marginBottom: 10}}>Login</Typography>
               <Link href = "/" style = {{alignSelf: "flex-start"}}>Home</Link>
@@ -123,27 +123,6 @@ const LoginPage = () => {
                 value = {password}
                 onChange = {(e) => setPassword(e.target.value)}
               />
-              {/* <Form.Group className = "mb-3">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control 
-                  type = 'email' 
-                  placeholder = 'Email' 
-                  onChange = {(e) => setEmail(e.target.value)}
-                  value = {email}
-                  required
-                />
-              </Form.Group> */}
-
-              {/* <Form.Group className = "mb-3">
-                <Form.Label>Password</Form.Label>
-                <Form.Control 
-                  type = 'password' 
-                  placeholder = 'Password' 
-                  onChange = {(e) => setPassword(e.target.value)}
-                  value = {password}
-                  required
-                />
-              </Form.Group> */}
             </FormContainer>
             
             <Button 

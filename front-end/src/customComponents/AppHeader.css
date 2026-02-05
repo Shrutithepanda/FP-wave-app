@@ -1,0 +1,5 @@
+.active {
+    background: "white";
+    border-radius: 2;
+    box-shadow: "0 0 5px 1px hsl(239, 78%, 86%) inset";
+}

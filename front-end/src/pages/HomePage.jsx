@@ -1,6 +1,5 @@
 import React from 'react'
 // import { Link } from 'react-router-dom'
-import './HomePage.css'
 // import Container from 'react-bootstrap/Container'
 // import Card from 'react-bootstrap/Card'
 // import Button from 'react-bootstrap/Button'
@@ -34,7 +33,7 @@ const ContentContainer = styled(Box) ({
  */
 function HomePage() {
   return (
-    <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+    <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
       <Card style = {{padding: "40px 80px", backgroundColor: "#F4F4FF"}}> 
         <ContentContainer>
           <Typography variant = "h4">Wave</Typography>

@@ -1,18 +1,5 @@
 import supabase from "../../front-end/src/supabase/supabaseClient.js"
 
-/** 
- * Model to check if correct data, 
- * and its type are being passed to the database.
- * Supabase is RESTFul so maybe wouldn't need this
-*/ 
-const EmailSchema_x = {
-    // field: {
-    //     type: type,
-    //     required: true,
-    //     default: true/false/optional -- false for delelte, true for trash
-    // }
-}
-
 /**
  * Model that queries supabase tables for CRUD operations
  */
@@ -22,12 +9,12 @@ class Emails {
      * @returns data or error
      */
     static async fetchInbox () {
-        const {data, error} = await supabase
+        const { data, error } = await supabase
         .from("Inbox")
         .select("*")
+        .order("created_at", { ascending: false })
 
-        if(error){
-            console.log(error)
+        if (error) {
             throw error
         }
         else {
@@ -42,29 +29,32 @@ class Emails {
      * @param {boolean} priority
      * @returns data or error
      */
-    static async fetchByFolderOrPriority (id, folder = "", priority = false) {
+    static async fetchByFolderOrPriority (id, folder = "", priority = "") {
         if (folder !== ""){
             const { data, error } = await supabase
             .from("Emails")
             .select()
             .eq("user_id", id)
             .eq("folder", folder)
+            .order("created_at", {ascending: false})
             
-            if(error){
+            if (error) {
                 throw error
             }
             else {
                 return data
             }
         }
-        if (priority){
+        // ⚠️ Also query high-priority mails from Inbox table
+        if (priority) {
             const { data, error } = await supabase
             .from("Emails")
             .select()
             .eq("user_id", id)
             .eq("priority", true)
+            .order("created_at", {ascending: false})
             
-            if(error){
+            if (error) {
                 throw error
             }
             else {
@@ -84,7 +74,7 @@ class Emails {
         .from("Emails")
         .insert(email)
         
-        if(error){
+        if (error) {
             throw error
         }
         else {
@@ -105,7 +95,7 @@ class Emails {
        .in("id", id)
        .select()
        
-       if(error){
+       if (error) {
            throw error
        }
        else {
@@ -113,19 +103,50 @@ class Emails {
        }
     }
 
-    static async updatePriority (id, value) {
-       const { data, error } = await supabase
-       .from("Emails")
-       .update({"priority": value})
-       .in("id", id)
-       .select()
-       
-       if(error){
-           throw error
-       }
-       else {
-           return data
-       }
+    static async updatePriority (id, value, type = "") {
+        if (type === "inbox") {
+            const { data, error } = await supabase
+            .from("Inbox")
+            .update({"priority": value})
+            .in("id", id)
+            .select()
+            
+            if (error) {
+                throw error
+            }
+            else {
+                return data
+            }  
+        }
+        else {
+            const { data, error } = await supabase
+            .from("Emails")
+            .update({"priority": value})
+            .in("id", id)
+            .select()
+            
+            if (error) {
+                throw error
+            }
+            else {
+                return data
+            }
+        }
+    }
+    
+    static async markRead (id, value) {
+        const { data, error } = await supabase
+        .from("Inbox")
+        .update({"read": value})
+        .in("id", id)
+        .select()
+
+        if (error) {
+            throw error
+        }
+        else {
+            return data
+        }
     }
 
     /**
@@ -144,7 +165,7 @@ class Emails {
         // .from("Emails")
         // .select("*")
        
-       if(error){
+       if (error) {
            throw error
        }
        else {

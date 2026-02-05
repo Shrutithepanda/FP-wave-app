@@ -53,7 +53,7 @@ const Footer = styled(Box) ({
     padding: "10px 15px",
 })
 
-const ComposeMail = ({ openDialog, setOpenDialog }) => {
+const ComposeTask = ({ openDialog, setOpenDialog }) => {
     const [data, setData] = useState({})
     const { user } = useAuth()
     // Initialise sent email service using the custom hook for saving sent emails
@@ -166,4 +166,4 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
     )
 }
 
-export default ComposeMail
+export default ComposeTask
