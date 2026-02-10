@@ -27,7 +27,7 @@ export const EMAIL_SIDERBAR_CONTENT = [
         icon: <Trash3 color = "black" size = {20}  aria-label = "Trash" />
     },
     {
-        name: "high-priority",
+        name: "important",
         title: "Important",
         icon: <Bookmark color = "black" size = {20}  aria-label = "Important" />
     },
@@ -60,7 +60,7 @@ export const TASK_SIDERBAR_CONTENT = [
         icon: <Trash3 color = "black" size = {20}  aria-label = "Trash" />
     },
     {
-        name: "high-priority",
+        name: "important",
         title: "Important",
         icon: <Bookmark color = "black" size = {20}  aria-label = "Important" />
     },

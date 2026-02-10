@@ -11,6 +11,7 @@ import { AppBar, Toolbar, styled, InputBase, Box, Typography, IconButton, Menu, 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { useEmotion } from '../hooks/EmotionProvider'
 import { NavLink, Router, useLocation, useNavigate } from 'react-router-dom'
+import { Colours } from '../constants/colours'
 
 const StyledAppBar = styled(AppBar) ({
     background: "#F0F0F0",
@@ -34,15 +35,11 @@ const SearchWrapper = styled(Box) ({
 })
 
 const TabsWrapper = styled(Box) ({
-// const TabsWrapper = styled(Tabs) ({
-    width: "15%",
+    width: "15vw",
     height: 50,
     display: "flex",
+    alignItems: "center",
     marginRight: 20,
-    background: "#ddd8d8",
-    border: "0.5px solid #838383",
-    borderRadius: 45,
-
     '& > a': {
         width: "50%",
         height: "100%",
@@ -51,11 +48,10 @@ const TabsWrapper = styled(Box) ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 45,
-        // ⚠️ Only stays active for inbox, and projects pages, not others
         "&.active": {
-            background: "#DDDDEE",
-            border: "0.5px solid #7578BD"
+            // background: "#DDDDEE",
+            borderBottom: `2px solid ${Colours.secondary}`,
+            paddingTop: 0
             // boxShadow: "0 0 5px 3px #BFC0F7 inset",
         }
     }
@@ -88,24 +84,6 @@ const AppHeader = ({ toggleSidebar }) => {
     const handleRecording = () => {
         if (!camOn) startCapturing()
         else stopCapturing()
-    }
-
-    const routes = {
-        0: "/emails",
-        1: "/tasks"
-    }
-
-    const tabs = {
-        "/emails": "0",
-        "/tasks": "1"
-    }
-
-    const currentTab = tabs[location.pathname] || "0"
-    // const [tab, setTab] = useState("0")
-
-    const handleTabChange = (event, changedTab) => {
-        setTab(changedTab)
-        navigate(tabs[changedTab])
     }
 
     useEffect(() => {
@@ -149,7 +127,7 @@ const AppHeader = ({ toggleSidebar }) => {
 
                     <SearchWrapper 
                         style = {{
-                            boxShadow: `0px 1px 7px 1px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`,
+                            boxShadow: `0px 1px 8px 1px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`,
                             transition: 'box-shadow 0.5s ease-in'
                         }}
                     >
@@ -170,13 +148,13 @@ const AppHeader = ({ toggleSidebar }) => {
                     }}
                 >
                     <NavLink
-                        to = "/emails/inbox" 
+                        to = "/emails" 
                     >
                         Emails
                     </NavLink>
 
                     <NavLink
-                        to = "/tasks/projects" 
+                        to = "/tasks" 
                     >
                         Tasks
                     </NavLink>

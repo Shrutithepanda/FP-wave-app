@@ -3,7 +3,7 @@ export const VIEWS = {
     sent: "sent",
     drafts: "drafts",
     archives: "archives",
-    important: "high-priority",
+    important: "important",
     trash: "trash",
 }
 
@@ -25,7 +25,7 @@ export const EMPTY_TABS = {
         subHeading: "Archived mails will be shown here."
     },
     important: {
-        heading: "You haven't any emails important yet.",
+        heading: "You haven't marked any emails important yet.",
         subHeading: "Save any emails important to you by clicking the bookmark icon."
     },
     trash: {

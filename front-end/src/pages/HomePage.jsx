@@ -4,6 +4,20 @@ import React from 'react'
 // import Card from 'react-bootstrap/Card'
 // import Button from 'react-bootstrap/Button'
 import { Box, Card, Link, styled, Typography } from '@mui/material'
+import { Colours } from '../constants/colours'
+
+const MainContainer = styled(Box) ({
+  display: "flex", 
+  flexGrow: 1, 
+  justifyContent: "center", 
+  alignItems: "center", 
+  backgroundColor: "white"
+})
+
+const StyledContainer = styled(Card) ({
+  padding: "40px 80px", 
+  backgroundColor: "#F4F4FF"
+})
 
 const ContentContainer = styled(Box) ({
   display: "flex",
@@ -22,7 +36,8 @@ const ContentContainer = styled(Box) ({
     textTransform: "none",
     textDecoration: "none",
     color: "#fff",
-    backgroundColor: "#42458A",
+    // backgroundColor: "#42458A",
+    backgroundColor: Colours.primary,
     borderRadius: 7,
   }
 })
@@ -33,8 +48,8 @@ const ContentContainer = styled(Box) ({
  */
 function HomePage() {
   return (
-    <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
-      <Card style = {{padding: "40px 80px", backgroundColor: "#F4F4FF"}}> 
+    <MainContainer>
+      <StyledContainer> 
         <ContentContainer>
           <Typography variant = "h4">Wave</Typography>
           <Typography variant = "subtitle1">Emotion-aware Email and Task Manager</Typography>
@@ -42,9 +57,9 @@ function HomePage() {
           <Link href = "/login" variant = "button">Login</Link>
           <Link href = "/register" variant = "button">Register</Link>
         </ContentContainer>
-      </Card>
+      </StyledContainer>
 
-    </Box>
+    </MainContainer>
     // <Container className = "d-flex justify-content-center Main-content-" > 
     //   <Card className = "align-self-center shadow">
     //     <Card.Body className = "m-5 Headings-" >

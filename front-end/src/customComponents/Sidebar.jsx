@@ -1,14 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { PersonFill, PencilSquare } from 'react-bootstrap-icons'
-import { Drawer, Box, List, ListItem, styled, IconButton } from '@mui/material'
+import { Drawer, Box, List, ListItem, styled, IconButton, Typography } from '@mui/material'
 
 import { EMAIL_SIDERBAR_CONTENT, TASK_SIDERBAR_CONTENT } from './sidebar.config'
 import { routes } from '../constants/routes'
 import ProfileModal from './ProfileModal'
 import ComposeMail from './ComposeMail'
+import { Colours } from '../constants/colours'
+import { useEmotion } from '../hooks/EmotionProvider'
 
 const Container = styled(Box) ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
     padding: "0 8px 0 0",
     "& > ul": {
         padding: "10px 0 0 5px",
@@ -26,7 +31,7 @@ const Container = styled(Box) ({
 })
 
 const ComposeButton = styled(Box) ({
-    background: "#BABBDE",
+    background: "#CFA9EF",
     color: "#001D35",
     padding: 15,
     marginLeft: 8,
@@ -36,6 +41,13 @@ const ComposeButton = styled(Box) ({
     cursor: "pointer"
 })
 
+const Indicator = styled(Typography) ({
+    borderRadius: 30,
+    padding: "3px 10px 3px 10px",
+    // background: "#DEDEDE",
+    // border: "1.5px solid gray",
+})
+
 const SideBar = ({ tasks = false, openSidebar }) => {
     const [openDialog, setOpenDialog] = useState(false)
     const [openProfile, setOpenProfile] = useState(false)
@@ -43,6 +55,7 @@ const SideBar = ({ tasks = false, openSidebar }) => {
     const onProfileClick = () => setOpenProfile(true)
 
     const { type } = useParams()
+    const { stressed } = useEmotion()
 
     return (
         tasks 
@@ -77,10 +90,10 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                                 <NavLink key = {data.name} to = {`${routes.emails.path}/${data.name}`}>
                                     <ListItem style = {type === data.name.toLowerCase() 
                                         ? {
-                                            backgroundColor: "#DDDDEE",
+                                            backgroundColor: Colours.selectedType,
                                             borderRadius: "0 16px 16px 0",
                                             // borderRadius: "16px",
-                                            border: "0.5px solid #7578BD",
+                                            border: "0.5px solid #94509e",
                                         } 
                                         : {}}
                                     >
@@ -91,6 +104,20 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                             ))
                         }
                     </List>
+                    
+                    {/* Indicator for Calm mode */}
+                    <Box sx = {{marginTop: "calc(100vh - 450px)", alignSelf: "center"}}>
+                        <Indicator 
+                            sx = {{
+                                background: stressed ? "#b6f8b8" : Colours.disabledBg,
+                                color: stressed ? "#1e5c21" : "#666666",
+                                border: stressed ? `1.5px solid #66ee6d` : `1.5px solid #c8c6c6`,
+                                boxShadow: `0px 2px 7px 2px ${stressed ? "#9efba1" : Colours.disabledBg}`
+                            }}
+                        >
+                            Calm Mode
+                        </Indicator>
+                    </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}
                     <ProfileModal openProfile = {openProfile} setOpenProfile = {setOpenProfile} />
@@ -131,10 +158,10 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                                 <NavLink key = {data.name} to = {`${routes.emails.path}/${data.name}`}>
                                     <ListItem style = {type === data.name.toLowerCase() 
                                         ? {
-                                            backgroundColor: "#DDDDEE",
+                                            backgroundColor: Colours.selectedType,
                                             borderRadius: "0 16px 16px 0",
                                             // borderRadius: "16px",
-                                            border: "0.5px solid #7578BD",
+                                            border: "0.5px solid #94509E",
                                         } 
                                         : {}}
                                     >
@@ -145,6 +172,20 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                             ))
                         }
                     </List>
+
+                    {/* Indicator for Calm mode */}
+                    <Box sx = {{marginTop: "calc(100vh - 450px)", alignSelf: "center"}}>
+                        <Indicator 
+                            sx = {{
+                                background: stressed ? "#b6f8b8" : Colours.disabledBg,
+                                color: stressed ? "#1e5c21" : "#666666",
+                                border: stressed ? `1.5px solid #66ee6d` : `1.5px solid #c8c6c6`,
+                                boxShadow: `0px 2px 7px 2px ${stressed ? "#9efba1" : Colours.disabledBg}`
+                            }}
+                        >
+                            Calm Mode
+                        </Indicator>
+                    </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}
                     <ProfileModal openProfile = {openProfile} setOpenProfile = {setOpenProfile} />

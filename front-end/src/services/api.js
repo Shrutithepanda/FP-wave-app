@@ -3,8 +3,8 @@ import axios from 'axios'
 const API_URL = "http://localhost:8000"
 
 /**
- * Contains basic structure for all API calls using the fetch API.
- * Used by the middleware.
+ * Contains basic structure for all API calls to the back-end using axios.
+ * Used by the middleware usApi.
  */
 const EMAIL_API = async (urlObject, body, type, user_id) => {
     return await axios({

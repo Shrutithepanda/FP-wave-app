@@ -10,6 +10,7 @@ import { useEmotion } from '../hooks/EmotionProvider'
 import { TASK_API_URLS } from '../services/api.urls'
 import { EMPTY_TABS } from '../constants/empty_tabs'
 import Task from './Task'
+import { Colours } from '../constants/colours'
 
 const Tasks = () => {
   const navigate = useNavigate()
@@ -60,7 +61,7 @@ const Tasks = () => {
               marginRight: 30,
               width: "calc(100% - 188px)",  // -158 px for sidebar's width + space for shadow, marginLeft prev. -> 150
               height: "calc(100vh - 70px)", // -70px for header's height,
-              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
               transition: 'box-shadow 0.5s ease-in',
               borderTopLeftRadius: 25,
               borderTopRightRadius: 25,
@@ -71,7 +72,7 @@ const Tasks = () => {
               marginRight: 30,
               width: "calc(100% - 60px)", 
               height: "calc(100vh - 70px)",
-              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
               transition: 'box-shadow 0.5s ease-in',
               borderTopLeftRadius: 25,
               borderTopRightRadius: 25,

@@ -11,9 +11,9 @@ import { Colours } from '../constants/colours'
 
 const dialogStyle = {
     height: 200,
-    width: "50%",
+    width: "40%",
     maxHeight: 200,
-    maxWidth: "50%",
+    maxWidth: "40%",
     boxShadow: "none",
     borderRadius: "10px",
 }
@@ -46,48 +46,34 @@ const StyledButton = styled(Button) ({
 
 const Footer = styled(Box) ({
     display: "flex",
-    justifyContent: "center",
-    padding: "0 15px",
+    justifyContent: "space-evenly",
+    padding: "0 10px",
 })
 
-const ProfileModal = ({ openProfile, setOpenProfile }) => {
+const ConfirmationModal = ({ openConfirmation, setOpenConfirmation, confirm, setConfirm }) => {
     const navigate = useNavigate()
-    const { user, logout } = useAuth()
     const [loading, setLoading] = useState(false)
+    // const [, ] = useState(false)
 
     const closeDialog = (e) => {
         e.preventDefault() 
-        setOpenProfile(false)
+        setOpenConfirmation(false)
     }
 
-    /**
-     * 
-     * Handle user log out.
-     */
-    const handleLogout = async (e) => {
+    const handleConfirm = async (e) => {
         e.preventDefault()
-        try {
-            setLoading(true)
-            const error = await logout()
-            navigate("/login")
-            setLoading(false)
-            // if (error) throw error
-            if (error) console.log("Error Logging out: ", error)
-            
-        } catch (error) {
-            console.log("Error Logging out: ", error.message)
-        }
+        setConfirm(true)
     }
 
     return (
         <div>
             <Dialog
-                open = {openProfile}
+                open = { openConfirmation }
                 PaperProps = {{ sx: dialogStyle }}
-                onClose = {(e) => closeDialog(e)}
+                onClose = { (e) => closeDialog(e) }
             >
                <Header>
-                    <Typography>Profile</Typography>
+                    <Typography>Delete</Typography>
                     <IconButton onClick = {(e) => closeDialog(e)} >
                         <XLg size = {12} color = "black" />
                     </IconButton>
@@ -99,12 +85,16 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
                     </Box>
                     : <Box>
                         <StyledText>
-                            <Typography variant = "subtitle1">{user?.email}</Typography>
+                            <Typography variant = "subtitle1">Are you sure you want to delete?</Typography>
                         </StyledText>
 
                         <Footer>
-                            <StyledButton onClick = {(e) => handleLogout(e)} style = {{width: ""}}>
-                                Logout
+                            <StyledButton onClick = {(e) => closeDialog(e)} sx = {{background: Colours.disabledBg, color: "#000"}}>
+                                Cancel
+                            </StyledButton>
+
+                            <StyledButton onClick = {(e) => handleConfirm(e)} value = {confirm} sx = {{background: Colours.cancel}} >
+                                Delete
                             </StyledButton>
                         </Footer>
                     </Box>
@@ -114,4 +104,4 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
     )
 }
 
-export default ProfileModal
+export default ConfirmationModal

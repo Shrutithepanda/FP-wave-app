@@ -5,6 +5,7 @@ import { routes } from "../constants/routes"
 import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
 import { EMAIL_API_URLS, TASK_API_URLS } from "../services/api.urls"
 import useApi from "../hooks/useApi"
+import { Colours } from "../constants/colours"
 
 const Wrapper = styled(Box) ({
     display: "flex",
@@ -31,13 +32,15 @@ const Indicator = styled(Box) ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    fontSize: "14px !important",
     color: "#222",
     padding: "0 7px",
     textWrap: "nowrap",
     borderRadius: "15px 0 0 15px",
     height: 25,
-    width: "100px !important"
+    width: "95px !important",
+    "& > p": {
+        fontSize: "14px !important",
+    }
 })
 
 const Date = styled(Typography) ({
@@ -58,8 +61,8 @@ const StyledText = styled(Box) ({
 
 const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) => {
     const navigate = useNavigate()
-    const [indicatorColor, setIndicatorColor] = useState("#CECECE")
-    const [barColor, setBarColor] = useState("#838282")
+    const [indicatorColor, setIndicatorColor] = useState(Colours.notStartedBg)
+    const [barColor, setBarColor] = useState(Colours.notStartedCircle)
     const toggleHighPriorityService = useApi(TASK_API_URLS.toggleHighPriorityProjects)
 
     const toggleHighPriorityTasks = () => {
@@ -82,16 +85,16 @@ const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) =>
 
     const changeIndicatorColor = () => {
         if (project.status === "In progress") {
-            setIndicatorColor("#B0CAF3")
-            setBarColor("#5688d8")
+            setIndicatorColor(Colours.inProgressBg)
+            setBarColor(Colours.inProgressCircle)
         }
         if (project.status === "Completed") {
-            setIndicatorColor("#95DBB6")
-            setBarColor("#47966c")
+            setIndicatorColor(Colours.completedBg)
+            setBarColor(Colours.completedCircle)
         }
         if (project.status === "Pending") {
-            setIndicatorColor("#fca9aa")
-            setBarColor("#cf6567")
+            setIndicatorColor(Colours.pendingBg)
+            setBarColor(Colours.pendingCircle)
         }
     }
 
@@ -101,7 +104,7 @@ const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) =>
 
     return (
         <Wrapper
-            sx = {{ background: "#EEEEF7" }}
+            sx = {{ background: Colours.cardBg }}
         >
             <Checkbox 
                 size = "small" 
@@ -111,7 +114,7 @@ const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) =>
             />
             {project.priority === true
                 ? <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
-                    <BookmarkFill size = {20} color = "#7578BD" style = {{flexShrink: 0}} />
+                    <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} />
                 </IconButton>
                 : <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
                     <Bookmark size = {20} style = {{flexShrink: 0}} />

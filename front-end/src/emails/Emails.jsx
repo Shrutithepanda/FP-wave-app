@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowClockwise, Trash3 } from 'react-bootstrap-icons'
-import { Box, Checkbox, IconButton, List } from '@mui/material'
+import { ArrowClockwise, Trash3, XLg } from 'react-bootstrap-icons'
+import { Backdrop, Box, Button, Checkbox, Dialog, IconButton, List, styled, Typography } from '@mui/material'
 
 import Email from './Email'
 import NoMails from './NoMails'
@@ -12,6 +12,9 @@ import { useEmotion } from '../hooks/EmotionProvider'
 
 import { EMAIL_API_URLS } from '../services/api.urls'
 import { EMPTY_TABS } from '../constants/empty_tabs'
+import Loader from '../customComponents/Loader'
+import { Colours } from '../constants/colours'
+import ConfirmationModal from '../customComponents/ConfirmationModal'
 
 const Emails = () => {
     const navigate = useNavigate()
@@ -22,6 +25,9 @@ const Emails = () => {
     const [selectedEmails, setSelectedEmails] = useState([])
     const [refresh, setRefresh] = useState(false)
     const [loading, setLoading] = useState(false)
+
+    const [openConfirmation, setOpenConfirmation] = useState(false)
+    const [confirmDelete, setConfirmDelete] = useState(false)
     
     const { openSidebar } = useOutletContext(true)
     const { type } = useParams()
@@ -37,11 +43,16 @@ const Emails = () => {
 
     // How to refresh when emails are sent from the sent page, composeMail
     useEffect(() => { 
-        setLoading(true)
-        // Get all from the backend where the type matches, body - empty for get request
-        getEmailsService.call({}, type, user.id)
+        const fetchData = async () => {
+            // Get the loading state from useApi too 
+            setLoading(true) // never sets to true
+            // Get all from the backend where the type matches, body - empty for get request
+            await getEmailsService.call({}, type, user.id)
+            // setEmailData(result)
+            setLoading(false)
 
-        setLoading(false)
+        }
+        fetchData()
     }, [type, refresh])
 
     // For checkbox at the top of the container
@@ -62,13 +73,17 @@ const Emails = () => {
             deleteEmailService.call(selectedEmails)
         }
         else {
+            // setOpenConfirmation(true)
+            // if (confirmDelete) {
             setLoading(true)
             // Move emails to trash folder
             moveEmailsToTrashService.call(selectedEmails)
             setSelectedEmails([])
             setLoading(false)
+                // console.log(confirmDelete)
+            // }
         }
-        setRefresh(prevState => !prevState)
+        // setRefresh(prevState => !prevState)
     }
 
     const handleRefresh = () => {
@@ -84,7 +99,7 @@ const Emails = () => {
                         marginRight: 30,
                         width: "calc(100% - 188px)",  // -158 px for sidebar's width + space for shadow, marginLeft prev. -> 150
                         height: "calc(100vh - 70px)", // -70px for header's height,
-                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
                         transition: 'box-shadow 0.5s ease-in',
                         borderTopLeftRadius: 25,
                         borderTopRightRadius: 25,
@@ -95,7 +110,7 @@ const Emails = () => {
                         marginRight: 30,
                         width: "calc(100% - 60px)", 
                         height: "calc(100vh - 70px)",
-                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : "hsl(239, 78%, 86%)"}`, 
+                        boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
                         transition: 'box-shadow 0.5s ease-in',
                         borderTopLeftRadius: 25,
                         borderTopRightRadius: 25,
@@ -114,19 +129,24 @@ const Emails = () => {
                         </IconButton>
                     </span>
                 </Box>
-                
-                <List>
-                    {getEmailsService?.response?.map((email, index) => (
-                        <Email 
-                            key = {index} 
-                            email = {email} 
-                            type = {type}
-                            selectedEmails = {selectedEmails}
-                            setSelectedEmails = {setSelectedEmails}
-                            setRefresh = {setRefresh}
-                        />
-                    ))}
-                </List>
+
+                    {loading 
+                        ? <Box sx = {{margin: "auto auto", flexGrow: 1}} >
+                            <Loader/> 
+                        </Box>
+                        : <List>
+                            {getEmailsService?.response?.map((email, index) => (
+                                    <Email 
+                                        key = {index} 
+                                        email = {email} 
+                                        type = {type}
+                                        selectedEmails = {selectedEmails}
+                                        setSelectedEmails = {setSelectedEmails}
+                                        setRefresh = {setRefresh}
+                                    />
+                                ))}
+                        </List>
+                    }
                 {
                     getEmailsService?.response?.length === 0 && 
                     <NoMails
@@ -134,6 +154,12 @@ const Emails = () => {
                     />
                 }
             </Box>
+            {/* <ConfirmationModal 
+                openConfirmation = {openConfirmation} 
+                setOpenConfirmation = {setOpenConfirmation} 
+                confirm = {confirmDelete} 
+                setConfirm = {setConfirmDelete}
+            /> */}
         </Box>
     )
 }

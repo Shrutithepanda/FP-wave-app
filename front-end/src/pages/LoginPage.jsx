@@ -7,6 +7,7 @@ import Form from 'react-bootstrap/Form'
 import { useEffect } from 'react'
 import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
 import { House } from 'react-bootstrap-icons'
+import { Colours } from '../constants/colours'
 
 const StyledCard = styled(Card) ({
   padding: "20px 60px",   
@@ -15,7 +16,7 @@ const StyledCard = styled(Card) ({
   "& > button": {
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: "#42458A"
+    backgroundColor: Colours.primary
   }
 })
 
@@ -116,6 +117,7 @@ const LoginPage = () => {
                 required
                 // id = "outlined-basic" 
                 label = "Password" 
+                type = "password"
                 variant = "outlined" 
                 size = "small"
                 fullWidth

@@ -252,7 +252,7 @@ const App = () => {
         <SideBar openSidebar = {openSidebar} />
         {/* <SideBar openSidebar = {openSidebar} shadowColor = {stressed ? "lightgreen" : "#F5F5F5"} /> */}
         {/* Render all the children of the route wrapped in Suspense (because they are lazy loaded in the router.jsx file) */}
-        <Suspense fallback = {<Loader/>} >
+        <Suspense fallback = {<Loader/>}>
           <Outlet context = {{ openSidebar }} />
         </Suspense>
       </Box>

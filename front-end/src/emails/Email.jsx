@@ -6,6 +6,7 @@ import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
 import { EMAIL_API_URLS } from "../services/api.urls"
 import useApi from "../hooks/useApi"
 import ViewEmail from "./ViewEmail"
+import { Colours } from "../constants/colours"
 
 const Wrapper = styled(Box) ({
     display: "flex",
@@ -66,7 +67,9 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
     }
 
     const markEmailAsRead = () => {
-        markAsReadService.call({ id: email.id, read: !email.read })
+        if (!email.read) {
+            markAsReadService.call({ id: email.id, read: !email.read })
+        }
     }
 
     const onValueChange = () => {
@@ -83,7 +86,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
 
     return (
         <Wrapper
-            sx = {{ background: "#EEEEF7" }}
+            sx = {{ background: Colours.cardBg }}
         >
             <Checkbox 
                 size = "small" 
@@ -93,7 +96,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
             />
             {email.priority === true
                 ? <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
-                    <BookmarkFill size = {20} color = "#7578BD" style = {{flexShrink: 0}} />
+                    <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} />
                 </IconButton>
                 : <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
                     <Bookmark size = {20} style = {{flexShrink: 0}} />
@@ -129,7 +132,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                         <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
                             { email.read 
                                 ? <></>
-                                : <CircleFill size = {10} color = "#E87476" style = {{marginRight: 10}} />
+                                : <CircleFill size = {10} color = {Colours.error} style = {{marginRight: 10}} />
                             }
                             <Date>
                                 {(new window.Date(email.created_at)).getDate()}&nbsp;

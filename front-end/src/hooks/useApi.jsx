@@ -2,7 +2,7 @@ import { useState } from "react"
 import EMAIL_API from "../services/api"
 
 /**
- * Custom hook, middleware to handle API calls
+ * Custom hook, middleware to make API calls
  * @param {object} urlObject - the object passed by the client as a call to the email API
  * @returns call function, response, error, and loading state
  */

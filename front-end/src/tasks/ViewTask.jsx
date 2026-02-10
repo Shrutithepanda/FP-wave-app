@@ -8,6 +8,7 @@ import { useEmotion } from "../hooks/EmotionProvider"
 import { useEffect } from "react"
 import { useState } from "react"
 import ComposeTask from "../customComponents/ComposeTask"
+import { Colours } from "../constants/colours"
 
 const IconWrapper = styled(Box) ({
     padding: 20,
@@ -56,8 +57,8 @@ const Date = styled(Box) ({
 })
 
 const ViewTask = () => {
-    const [indicatorColor, setIndicatorColor] = useState("#CECECE")
-    const [circleColor, setCircleColor] = useState("#838282")
+    const [indicatorColor, setIndicatorColor] = useState(Colours.notStartedBg)
+    const [circleColor, setCircleColor] = useState(Colours.notStartedCircle)
 
     const [openDialog, setOpenDialog] = useState(false)
     const createNewTask = () => setOpenDialog(true)
@@ -78,7 +79,7 @@ const ViewTask = () => {
         window.history.back()
     }
 
-    const toggleHighPriorityMails = () => {
+    const toggleHighPriorityProjects = () => {
         toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
         // setRefresh(prevState => !prevState)
         window.location.reload()
@@ -90,16 +91,16 @@ const ViewTask = () => {
 
     const changeIndicatorColor = () => {
         if (project.status === "In progress") {
-            setIndicatorColor("#B0CAF3")
-            setCircleColor("#5688d8")
+            setIndicatorColor(Colours.inProgressBg)
+            setCircleColor(Colours.inProgressCircle)
         }
         if (project.status === "Completed") {
-            setIndicatorColor("#95DBB6")
-            setCircleColor("#47966c")
+            setIndicatorColor(Colours.completedBg)
+            setCircleColor(Colours.completedCircle)
         }
         if (project.status === "Pending") {
-            setIndicatorColor("#fca9aa")
-            setCircleColor("#cf6567")
+            setIndicatorColor(Colours.pendingBg)
+            setCircleColor(Colours.pendingCircle)
         }
     }
 
@@ -114,7 +115,7 @@ const ViewTask = () => {
                     marginLeft: 158, 
                     marginRight: 30,
                     width: "calc(100% - 188px)",  // -158 px for sidebar's width + space for shadow, marginLeft prev. -> 150
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : "hsl(239, 78%, 86%)"}`, 
+                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
                     height: "calc(100vh - 70px)", // -70px for header's height,
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
@@ -124,7 +125,7 @@ const ViewTask = () => {
                     marginLeft: 30, 
                     marginRight: 30,
                     width: "calc(100% - 60px)",
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : "hsl(239, 78%, 86%)"}`, 
+                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
                     height: "calc(100vh - 70px)",
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
@@ -133,9 +134,14 @@ const ViewTask = () => {
             } 
         >
             <IconWrapper>
-                <ArrowLeft size = {20} onClick = {() => window.history.back()} style = {{cursor: "pointer"}} />
-                <span style = {{marginLeft: "auto", marginRight: 20}}>
-                    <ArrowClockwise size = {20} color = "black" style = {{marginLeft: 0, cursor: "pointer"}} onClick = {handleRefresh} />
+                <IconButton onClick = {() => window.history.back()}>
+                    <ArrowLeft size = {20} aria-label = "back" />
+                </IconButton>
+                    
+                <span style = {{marginLeft: "auto", marginRight: 15}}>
+                    <IconButton onClick = {handleRefresh}>
+                        <ArrowClockwise size = {20} color = "black" aria-label = "reload" />
+                    </IconButton>
                 </span>
             </IconWrapper>
 
@@ -150,11 +156,17 @@ const ViewTask = () => {
                     </Indicator>
                 
                 {project.priority === true
-                    ? <BookmarkFill size = {20} color = "#7578BD" style = {{marginLeft: 10, cursor: "pointer"}} onClick = {() => toggleHighPriorityMails()} />
-                    : <Bookmark size = {20} style = {{marginLeft: 10, cursor: "pointer"}} onClick = {() => toggleHighPriorityMails()} />
+                    ? <IconButton onClick = {() => toggleHighPriorityProjects()} style = {{marginLeft: 10}}>
+                        <BookmarkFill size = {20} color = {Colours.bookmark} />
+                    </IconButton>
+                    : <IconButton onClick = {() => toggleHighPriorityProjects()} style = {{marginLeft: 10}}>
+                        <Bookmark size = {20} />
+                    </IconButton>
                 }
                 <span style = {{marginLeft: "auto", marginRight: 40}}>
-                    <Trash3 size = {20} color = "#E87476" style = {{cursor: "pointer"}} onClick = {() => deleteEmail()} />
+                    <IconButton onClick = {() => deleteEmail()}>
+                        <Trash3 size = {20} color = {Colours.error} />
+                    </IconButton>
                 </span>
             </Subject>
             <Box style = {{display: "flex"}} >

@@ -16,7 +16,7 @@ export const EMAIL_API_URLS = {
         method: "POST"
     },
     toggleHighPriorityEmails: {
-        endpoint: "high-priority",
+        endpoint: "important",
         method: "POST"
     },
     deleteEmail: {
@@ -39,7 +39,7 @@ export const TASK_API_URLS = {
         method: "POST"
     },
     toggleHighPriorityProjects: {
-        endpoint: "high-priority-projects",
+        endpoint: "important-projects",
         method: "POST"
     }
 }

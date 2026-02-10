@@ -8,13 +8,12 @@ export const getEmails = async (req, res) => {
         if (req.params.type === "inbox") {
             emails = await Emails.fetchInbox()
         }
-        else if (req.params.type === "high-priority") {
+        else if (req.params.type === "important") {
             emails = await Emails.fetchByFolderOrPriority(req.headers.user, "", req.params.type)
         }
         else {
             emails = await Emails.fetchByFolderOrPriority(req.headers.user, req.params.type, "")
         }
-        
         return res.status(200).json(emails)
     } catch (error) {
         console.log("controller, getEmails: ", error.message)
@@ -50,10 +49,10 @@ export const moveEmailsToTrash = async (req, res) => {
 
 export const toggleHighPriorityEmails = async (req, res) => {
     try {
-        // console.log(req.body)
+        // console.log(req.body?.type)
         const emails = await Emails.updatePriority([req.body?.id], req.body?.priority, req.body?.type)
         // const email = await Emails.updatePriority(req.body?.priority)
-        return res.status(200).json("emails moved to high priority folder successfully", emails)
+        return res.status(200).json("emails moved to important folder successfully", emails)
     } catch (error) {
         console.log("controller, toggleHighPriorityEmails: ", error.message)
         res.status(500).json(error.message)

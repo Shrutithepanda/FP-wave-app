@@ -25,7 +25,7 @@ routes.post("/save-draft", saveSentEmail)
 
 routes.post("/delete", moveEmailsToTrash)
 
-routes.post("/high-priority", toggleHighPriorityEmails)
+routes.post("/important", toggleHighPriorityEmails)
 
 routes.delete("/completely-delete", deleteEmails)
 
@@ -34,7 +34,7 @@ routes.post("/read-email", markEmailAsRead)
 // Routes for Tasks
 routes.get("/tasks/:type", getProjects)
 
-routes.post("/high-priority-projects", toggleHighPriorityProjects)
+routes.post("/important-projects", toggleHighPriorityProjects)
 
 // Routes for Emotions
 routes.post("/detect-emotions", detectEmotions)

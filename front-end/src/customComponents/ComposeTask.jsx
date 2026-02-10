@@ -4,6 +4,7 @@ import { Folder, Send, Trash3, XLg } from "react-bootstrap-icons"
 import { useAuth } from "../hooks/AuthProvider"
 import useApi from "../hooks/useApi"
 import { EMAIL_API_URLS } from "../services/api.urls"
+import { Colours } from "../constants/colours"
 
 const dialogStyle = {
     height: "90%",
@@ -20,7 +21,7 @@ const Header = styled(Box) ({
     justifyContent: "space-between",
     alignItems: "center",
     padding: "10px 15px",
-    background: "#EEEEF7",
+    background: Colours.cardBg,
     '& > p': {
         fontSize: 15,
     }
@@ -32,7 +33,7 @@ const RecipientsWrapper = styled(Box) ({
     padding: "0px 15px",
     '& > div': {
         fontSize: 15,
-        borderBottom: "1px solid #EEEEF7",
+        borderBottom: `1px solid ${Colours.cardBg}`,
         marginTop: 10,
         padding: "10px 15px",
         alignItems: "center"
@@ -40,7 +41,7 @@ const RecipientsWrapper = styled(Box) ({
 })
 
 const SendButton = styled(Button) ({
-    background: "#42458A",
+    background: Colours.primary,
     color: "#FFF",
     borderRadius: 20,
     textTransform: "none",
@@ -158,7 +159,7 @@ const ComposeTask = ({ openDialog, setOpenDialog }) => {
                     </SendButton>
 
                     <Button>
-                        <Trash3 onClick = {() => setOpenDialog(false)} size = {20} color = "#E87476" />
+                        <Trash3 onClick = {() => setOpenDialog(false)} size = {20} color = {Colours.error} />
                     </Button>
                </Footer>
             </Dialog>
