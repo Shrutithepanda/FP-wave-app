@@ -3,6 +3,8 @@ export const Colours = {
     secondary: "#A054DE",
     error: "#E87476",
     cancel: "#e75254",
+    background: "#F0F0F0",
+    container: "#F9F9F9",
     disabledBg: "#DEDEDE",
     disabledBorder: "#A2A0A0",
     cardBg: "#F3EAFB",

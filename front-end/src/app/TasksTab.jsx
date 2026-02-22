@@ -8,6 +8,8 @@ import Loader from "../customComponents/Loader"
 
 const TasksTab = () => {
     const [openSidebar, setOpenSidebar] = useState(true)  
+
+    // Toggle sidebar's open state
     const toggleSidebar = () => setOpenSidebar(prevState => !prevState)
 
     return (
@@ -18,6 +20,7 @@ const TasksTab = () => {
             {/* Sidebar for tasks pages and content in the pages */}
             <Box>
                 <SideBar openSidebar = { openSidebar } tasks = { true } />
+                
                 {/* Fallback to the loader component until children (lazy loaded) are rendered */}
                 <Suspense fallback = {<Loader/>} >
                     <Outlet context = {{ openSidebar }} />

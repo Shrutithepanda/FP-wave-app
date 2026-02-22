@@ -1,9 +1,13 @@
 import { Box, Typography } from "@mui/material"
 import { useRouteError } from "react-router-dom"
 
+/**
+ * 
+ * @returns Message to show when there is an error
+ */
 const ErrorComponent = () => {
     const error = useRouteError()
-    console.log("Error component: ", error)
+    console.log(error)
 
     return (
         <Box style = {{marginLeft: 150}} >

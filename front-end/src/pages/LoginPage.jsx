@@ -2,11 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/AuthProvider'
 import Loader from '../customComponents/Loader'
-import Form from 'react-bootstrap/Form'
-// import Button from 'react-bootstrap/Button'
-import { useEffect } from 'react'
 import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
-import { House } from 'react-bootstrap-icons'
 import { Colours } from '../constants/colours'
 
 const StyledCard = styled(Card) ({
@@ -24,13 +20,12 @@ const FormContainer = styled(Box)({
   marginBottom: 10,
   "& > div": {
     marginTop: 10,
-    // marginBottom: 10
   }
 })
 
 /**
  * 
- * @returns contents of the Login page: forms and submit button
+ * @returns contents of the Login page
  */
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -38,37 +33,34 @@ const LoginPage = () => {
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
-  const [disabled, setDisabled] = useState(false)
 
   const { login } = useAuth()
 
   /**
-   * 
    * Handle log in with values passed in input fields. If error is returned display the error message.
+   * @param {*} event 
    */
   const handleSubmit = async (event) => {
     event.preventDefault() // prevent automatic refreshing
     setMessage("") // clear any previous message
     
     if (email === "", password === ""){
+      // Display a message if fields are empty and submit is pressed
       setMessage("All fields must be filled before proceeding.")
     }
     else {
       setLoading(true)
       try {
-
-        // const {data, error} = await login(email, password)
+        // Wait for the login function to log the user in
         const result = await login(email, password)
 
+        // If success response is not returned display the erorr message
         if (!result.success) setMessage(result.error)
-        if (result.success) {
-          navigate("/emails")
-          // navigate("/")
-          // console.log(data)
-        }
+
+        // If success response is returned, navigate to the emails page
+        if (result.success) navigate("/emails")
           
       } catch (error) {
-        // console.log(error.message)
         setMessage(error.message)
       } finally {
         setLoading(false)
@@ -84,63 +76,60 @@ const LoginPage = () => {
   // If loading display the loader otherwise the content
   return (loading 
     ? (
-      <>
+      <Box>
         <Loader />
-      </>
+      </Box>
     )
     : (
-      <Box style = {{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
+      <Box sx = {{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
         <StyledCard>
-              <Typography variant = "h4" style = {{marginBottom: 10}}>Login</Typography>
-              <Link href = "/" style = {{alignSelf: "flex-start"}}>Home</Link>
+          {/* Heading and link to Home page */}
+          <Typography variant = "h4" sx = {{ marginBottom: 10 }}>Login</Typography>
+          <Link href = "/" sx = {{ alignSelf: "flex-start" }}>Home</Link>
 
-            {/* If there is a message, display it */}
-            {message && <Typography color = "error">{message}</Typography>}
+          {/* If there is a message, display it */}
+          {message && <Typography color = "error">{message}</Typography>}
 
-            <FormContainer
-              // onSubmit = {handleSubmit}
-              // className = "text-start"
-            >
-              <TextField 
-                required
-                // id = "outlined-basic" 
-                label = "Emails address" 
-                variant = "outlined" 
-                size = "small"
-                fullWidth
-                // color = "secondary"
-                value = {email}
-                onChange = {(e) => setEmail(e.target.value)}
-              />
+          {/* Email and password fields */}
+          <FormContainer>
+            <TextField 
+              required
+              label = "Emails address" 
+              variant = "outlined" 
+              size = "small"
+              fullWidth
+              value = { email }
+              onChange = { (e) => setEmail(e.target.value) }
+            />
 
-              <TextField 
-                required
-                // id = "outlined-basic" 
-                label = "Password" 
-                type = "password"
-                variant = "outlined" 
-                size = "small"
-                fullWidth
-                // color = "secondary"
-                value = {password}
-                onChange = {(e) => setPassword(e.target.value)}
-              />
-            </FormContainer>
-            
-            <Button 
-              onClick = {handleSubmit} 
-              variant = "contained" 
-              disabled = {loading} 
-              data-testid = "login-btn"
-            >
-              Login
-            </Button>
+            <TextField 
+              required
+              label = "Password" 
+              type = "password"
+              variant = "outlined" 
+              size = "small"
+              fullWidth
+              value = { password }
+              onChange = { (e) => setPassword(e.target.value) }
+            />
+          </FormContainer>
           
-            <Typography>
-              Don't have an account yet? 
-              <Link href = "/register">Register</Link>
-            </Typography>
-          {/* </Card.Body> */}
+          {/* Submit button */}
+          <Button 
+            onClick = { handleSubmit } 
+            variant = "contained" 
+            disabled = { loading } 
+            data-testid = "login-btn"
+          >
+            Login
+          </Button>
+        
+          {/* Link to the Resigter page */}
+          <Typography>
+            Don't have an account yet? 
+            <Link href = "/register">Register</Link>
+          </Typography>
+
         </StyledCard>
       </Box>
     )

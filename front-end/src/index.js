@@ -7,7 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
-import App from './app/App';
 
 import AuthProvider from './hooks/AuthProvider';
 import Loader from './customComponents/Loader';
@@ -15,16 +14,19 @@ import EmotionProvider from './hooks/EmotionProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // Mounts things two times - so could be temporarily disabled. Also to prevent calling emotion API too frequently.
   <React.StrictMode>
 
+    {/* Emotion wrapper */}
     <EmotionProvider>
+      {/* Authentication wrapper */}
       <AuthProvider>
-        {/* Fallback to a screen showing loader */}
-        <Suspense fallback = {<Loader/>} >
+
+        {/* Fallback to a loading screen */}
+        <Suspense fallback = { <Loader/> } >
           {/* Provide routes */}
-          <RouterProvider router = {router} />
+          <RouterProvider router = { router } />
         </Suspense>
+
       </AuthProvider>
     </EmotionProvider>
     

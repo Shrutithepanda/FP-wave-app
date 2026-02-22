@@ -1,12 +1,10 @@
-import Modal from 'react-bootstrap/Modal'
-// import Button from 'react-bootstrap/Button'
-import { useAuth } from '../hooks/AuthProvider'
 import { useState } from 'react'
-import Loader from './Loader'
-// import Container from 'react-bootstrap/Container'
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Dialog, IconButton, InputBase, styled, TextField, Typography } from "@mui/material"
+import { Box, Button, Dialog, IconButton, styled, Typography } from "@mui/material"
 import { XLg } from 'react-bootstrap-icons'
+
+import Loader from './Loader'
+import { useAuth } from '../hooks/AuthProvider'
 import { Colours } from '../constants/colours'
 
 const dialogStyle = {
@@ -50,10 +48,17 @@ const Footer = styled(Box) ({
     padding: "0 15px",
 })
 
+/**
+ * 
+ * @param {boolean} openProfile 
+ * @param {function} setOpenProfile 
+ * @returns a dialog containing user's email and a log out button
+ */
 const ProfileModal = ({ openProfile, setOpenProfile }) => {
     const navigate = useNavigate()
-    const { user, logout } = useAuth()
     const [loading, setLoading] = useState(false)
+
+    const { user, logout } = useAuth()
 
     const closeDialog = (e) => {
         e.preventDefault() 
@@ -68,10 +73,14 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
         e.preventDefault()
         try {
             setLoading(true)
+
+            // Logout and nabigate to Login page
             const error = await logout()
             navigate("/login")
+
             setLoading(false)
-            // if (error) throw error
+
+            // In case of error, log it to the console
             if (error) console.log("Error Logging out: ", error)
             
         } catch (error) {
@@ -80,37 +89,42 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
     }
 
     return (
-        <div>
+        <Box>
             <Dialog
                 open = {openProfile}
                 PaperProps = {{ sx: dialogStyle }}
                 onClose = {(e) => closeDialog(e)}
             >
+                {/* Header containing dialog title and clode button */}
                <Header>
                     <Typography>Profile</Typography>
                     <IconButton onClick = {(e) => closeDialog(e)} >
-                        <XLg size = {12} color = "black" />
+                        <XLg size = {15} color = "#000" />
                     </IconButton>
                </Header>
 
+                {/* If loading show the loader otherwise show the content */}
                 {loading
-                    ? <Box sx = {{display: "flex", justifyContent: "center", height: "100%"}}>
+                    ? <Box sx = {{ display: "flex", justifyContent: "center", height: "100%" }}>
                         <Loader/>
                     </Box>
                     : <Box>
+                        {/* User's email */}
                         <StyledText>
-                            <Typography variant = "subtitle1">{user?.email}</Typography>
+                            <Typography variant = "subtitle1">{ user?.email }</Typography>
                         </StyledText>
 
+                        {/* Log out button */}
                         <Footer>
-                            <StyledButton onClick = {(e) => handleLogout(e)} style = {{width: ""}}>
+                            <StyledButton onClick = { (e) => handleLogout(e) }>
                                 Logout
                             </StyledButton>
                         </Footer>
                     </Box>
                 }
+                
             </Dialog>
-        </div>
+        </Box>
     )
 }
 

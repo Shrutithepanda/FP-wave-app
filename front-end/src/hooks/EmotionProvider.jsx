@@ -2,73 +2,97 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import useApi from "./useApi";
 import { EMOTION_API_URLS } from "../services/api.urls";
 
+// Create context
 const EmotionContext = createContext()
 
-const EmotionProvider = ({children}) => {
+/**
+ * Create a context provider 
+ * @returns capturing functions and stress state
+ */
+const EmotionProvider = ({ children }) => {
     let videoRef = useRef(null)
     let canvasRef = useRef(null)
+    const captureIntervalRef = useRef(null)
     
     const [camOn, setCamOn] = useState(false)
     const [emotions, setEmotions] = useState([{}])
     const [stressed, setStressed] = useState(false)
-    const captureIntervalRef = useRef(null)
 
+    // Initialise the emotion detection service
     const detectEmotionsService = useApi(EMOTION_API_URLS.detectEmotions)
 
+    /**
+     * Capture and image, send the image to the emotion detection API 
+     * and set the emotions object to the response received
+     * @returns detected emotion in the picture
+     */
     const captureAndDetectEmotions = async () => {
         // source: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
         if (videoRef.current && canvasRef.current) {
-            // setEmotions([{}])
+            // Set refs to current values
             const video = videoRef.current
             const canvas = canvasRef.current
             const context = canvas.getContext("2d")
 
+            // Check if video is set up properly
             // console.log({
             //     readyState: video.readyState,
             //     width: video.videoWidth,
             //     height: video.videoHeight,
             // })
 
+            // Set canvas dimensions
             canvas.width = video.videoWidth
             canvas.height = video.videoHeight
             
+            // Draw image on canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height)
 
+            // Get image 
             const imageSource = canvas.toDataURL("image/jpeg")
             
             // Convert the image to base 64
             const b64Image = imageSource?.replace(/^data:image\/jpeg;base64,/, "")
-            // console.log(b64Image)
 
+            // Call the API with the image captured
             const result = await detectEmotionsService?.call({ image: b64Image })
+
             if (result) {
+                // If result is not empty set emotions to the result
                 setEmotions(result)
-                // console.log(result) 
             } 
             else {
+                // Otherwise log the error
                 console.log("Error detecting emotions: ", detectEmotionsService?.error)
             }
         }
+
+        // Clean up
         return () => setEmotions([{}])
     }
     
+    /**
+     * Start capturing and turn the camera on
+     */
     const startCapturing = async () => {
         setCamOn(true)
+
         // source: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
+        // If media devices are available then set the video reference to the stream
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices
             .getUserMedia({ video: true })
             .then(stream => {
                 if (videoRef.current) {
-                    // videoRef.current.srcObject = stream
                     let video = videoRef.current
                     video.srcObject = stream
-                    video.onloadedmetadata = async ( ) =>
+                    // When video is loaded, play the video and catch any errors
+                    video.onloadedmetadata = async () =>
                     {                    
                         await video.play()
                         .catch(error => {
                             if (error.name === "AbortError") {
-                                console.log("Video play interrupted:", error)
+                                console.log("Video play was interrupted:", error)
                             } else {
                                 console.error("Error attempting to play video:", error)
                             }
@@ -76,11 +100,15 @@ const EmotionProvider = ({children}) => {
                     }
                 }
             })
-            .catch(error => console.log("Error with webcam access: ", error))
+            .catch(error => console.log("Error accessing the webcam: ", error))
         }
     }
 
+    /**
+     * Stop capturing and turn the camera off
+     */
     const stopCapturing = () => {
+        // Set the camera off and clear any intervals or refs
         setCamOn(false)
         clearInterval(captureIntervalRef.current)
         if (videoRef.current && videoRef.current.srcObject) {
@@ -89,6 +117,9 @@ const EmotionProvider = ({children}) => {
         }
     }
 
+    /**
+     * Infer stress from the emotion data received from the API
+     */
     const calculateStress = () => {
         const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
         const confidence = emotions[0]?.Confidence
@@ -121,12 +152,12 @@ const EmotionProvider = ({children}) => {
         // If the emotions object contain more than an empty array, [{...}]
         if (emotions?.length > 1) {
             calculateStress()
-            console.log(`Emotion detected: ${emotions[0].Type},  ${emotions[0].Confidence}`)
+            console.log(`Emotion detected: ${emotions[0].Type, emotions[0].Confidence}`)
         }
     }, [emotions])
 
     useEffect(() => {
-        console.log("Stressed: ", stressed)
+        // console.log("Stressed: ", stressed)
     }, [stressed])
 
     // ------- Code to detect stress from hard-coded emotions object every 5 seconds ------- 
@@ -245,6 +276,9 @@ const EmotionProvider = ({children}) => {
     const [emotionsInInterval, setEmotionsInInterval] = useState([])
     let idRef = useRef(0)
     useEffect(() => {
+        /**
+         * 
+         */
         const calculateDummyStress = () => {
             const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
             
@@ -291,16 +325,13 @@ const EmotionProvider = ({children}) => {
     useEffect(() => {
         // console.log("array:", emotionsInInterval)
     }, [emotionsInInterval])
-
-    // useEffect(() => {
-    //     console.log(stressed)
-    // }, [stressed])
     
     return (
         <EmotionContext.Provider
-            value = {{ stressed, camOn, startCapturing, stopCapturing, calculateStress, }}
+            value = {{ stressed, camOn, startCapturing, stopCapturing, calculateStress }}
         >
-            {children}
+            { children }
+            {/* Render video and canvas outside the screen */}
             <video 
                 ref = {videoRef} 
                 style = {{

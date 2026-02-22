@@ -1,42 +1,26 @@
-import { Box, Checkbox, colors, IconButton, styled, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
-import { Outlet, useNavigate } from "react-router-dom"
-import { routes } from "../constants/routes"
+import { Box, Checkbox, IconButton, styled, Typography } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
+
 import { EMAIL_API_URLS } from "../services/api.urls"
-import useApi from "../hooks/useApi"
-import ViewEmail from "./ViewEmail"
+import { routes } from "../constants/routes"
 import { Colours } from "../constants/colours"
+import useApi from "../hooks/useApi"
 
 const Wrapper = styled(Box) ({
     display: "flex",
     alignItems: "center",
     padding: "0 0 0 10px",
     marginBottom: 3,
-    // backgroundColor: "#F2F6FC",
     cursor: "pointer",
     "& > div": {
         display: "flex",
         width: "100%",
         flexGrow: 1,
-        // flexWrap: "wrap",
         "& > p": {
             fontSize: 15,
-            // overflow: "hidden", 
-            // whiteSpace: "nowrap", 
-            // textOverflow: "ellipsis"
         }
     }
-})
-
-const Indicator = styled(Typography) ({
-    fontSize: "12px !important",
-    background: "#DDD",
-    color: "#222",
-    padding: "0 4px",
-    borderRadius: 5,
-    marginRight: 6,
-    height: 20
 })
 
 const Date = styled(Typography) ({
@@ -48,37 +32,53 @@ const Date = styled(Typography) ({
 
 const StyledText = styled(Box) ({
     display: "flex", 
-    flexDirection: "row", 
-    // overflow: "hidden", 
-    // width: "90%", whiteSpace: "nowrap", textOverflow: "ellipsis", 
-    // background: "pink"
-    // color: "#424242"
+    flexDirection: "row"
 })
 
+/**
+ * An email component
+ * @param {object} email 
+ * @param {array} selectedEmails 
+ * @param {function} setSelectedEmails 
+ * @param {string} type 
+ * @param {boolean} setRefresh 
+ * @returns a single Email component with details, to show for the Emails tab
+ */
 const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) => {
     const navigate = useNavigate()
+
+    // Initialise toggle important emails service and mark as read service
     const toggleHighPriorityService = useApi(EMAIL_API_URLS.toggleHighPriorityEmails)
     const markAsReadService = useApi(EMAIL_API_URLS.markAsRead)
 
+    /**
+     * Mark emails important/unimportant when bookmark icon is clicked
+     */
     const toggleHighPriorityMails = () => {
         toggleHighPriorityService.call({ id: email.id, priority: !email.priority, type: type })
         setRefresh(prevState => !prevState)
         window.location.reload()
     }
 
+    /**
+     * If an email is not read and is opened, mark it as read
+     */
     const markEmailAsRead = () => {
         if (!email.read) {
             markAsReadService.call({ id: email.id, read: !email.read })
         }
     }
 
+    /**
+     * Select and deselect an email
+     */
     const onValueChange = () => {
-        // If selected emails already contain this email then filter this one out of the selected emails
         if (selectedEmails.includes(email.id)) {
+            // If the selected emails already contain this email then filter this one out of the selected emails
             setSelectedEmails(prevState => prevState.filter(id => id != email.id))
         }
-        // If selected emails do not have this email, append this email to the selected emails
         else {
+            // If the selected emails do not have this email, append this email to the selected emails
             setSelectedEmails(prevState => [...prevState, email.id])
 
         }
@@ -88,21 +88,33 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
         <Wrapper
             sx = {{ background: Colours.cardBg }}
         >
+            {/* Checkbox to mark email important or un-important */}
             <Checkbox 
                 size = "small" 
                 // checked if the id value exists in the array - selectedEmails
-                checked = {selectedEmails.includes(email.id)} 
-                onChange = {() => onValueChange()}
+                checked = { selectedEmails.includes(email.id) } 
+                onChange = { onValueChange }
             />
+
+            {/* Bookmark icon - filled if email is marked important */}
             {email.priority === true
-                ? <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
-                    <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} />
+                ? <IconButton 
+                    size = "small" 
+                    onClick = { toggleHighPriorityMails } 
+                    sx = {{ marginRight: 1 }}
+                >
+                    <BookmarkFill size = {20} color = { Colours.bookmark } style = {{ flexShrink: 0 }} />
                 </IconButton>
-                : <IconButton size = "small" onClick = {() => toggleHighPriorityMails()} sx = {{marginRight: 1}}>
-                    <Bookmark size = {20} style = {{flexShrink: 0}} />
+                : <IconButton 
+                    size = "small" 
+                    onClick = { toggleHighPriorityMails } 
+                    sx = {{ marginRight: 1 }}
+                >
+                    <Bookmark size = {20} style = {{ flexShrink: 0 }} />
                 </IconButton>
             }
 
+            {/* Email info. Navigates to ViewEmail page on click. */}
             <Box 
                 onClick = {
                     // Route to ViewEmail component path
@@ -110,8 +122,9 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                         navigate(
                             routes.view_email.path, 
                             // Share the email with the component
-                            {state: {email: email}}
+                            { state: { email: email } }
                         )
+                        // Mark email as read if it is unread
                         markEmailAsRead()
                     }
                 }
@@ -127,21 +140,36 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                     paddingBottom: 1
                 }}
             >
-                <Box sx = {{width: "100%", minWidth: 0, display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <Typography sx = {{color: email.read ? "#424242" : "black"}}>{email.send_to}</Typography>
-                        <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
+                {/* Email address, indicator and date received */}
+                <Box 
+                    sx = {{ width: "100%", minWidth: 0, display: "flex", flexDirection: "row", justifyContent: "space-between" }}
+                >
+                        <Typography 
+                            sx = {{ color: email.read ? "#424242" : "#000" }}
+                        >
+                            {email.send_to}
+                        </Typography>
+
+                        <Box 
+                            style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}
+                        >
                             { email.read 
                                 ? <></>
-                                : <CircleFill size = {10} color = {Colours.error} style = {{marginRight: 10}} />
+                                : <CircleFill 
+                                    size = {10} 
+                                    color = { Colours.error } 
+                                    style = {{ marginRight: 10 }} 
+                                />
                             }
                             <Date>
-                                {(new window.Date(email.created_at)).getDate()}&nbsp;
-                                {(new window.Date(email.created_at)).toLocaleDateString("default", {month: "short"})}, &nbsp;
-                                {(new window.Date(email.created_at)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
+                                { (new window.Date(email.created_at)).getDate() }&nbsp;
+                                { (new window.Date(email.created_at)).toLocaleDateString("default", { month: "short" }) }, &nbsp;
+                                { (new window.Date(email.created_at)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
                             </Date>
                         </Box>
                     </Box>
 
+                    {/* Email title and body */}
                     <StyledText
                         sx = {{
                             width: "95%",
@@ -149,7 +177,6 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                             overflow: "hidden",
                         }}
                     >
-                        {/* <Indicator>Inbox</Indicator> */}                        
                         <Box>
                             <Typography 
                                 sx = {{
@@ -157,7 +184,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
                                     fontWeight: "normal", 
-                                    color: email.read ? "#424242" : "black"
+                                    color: email.read ? "#424242" : "#000"
                                 }}
                             >
                                 {email.subject} {email.email_body && "-"} {email.email_body}

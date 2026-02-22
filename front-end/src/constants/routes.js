@@ -1,24 +1,22 @@
 import { lazy } from "react";
 import ProtectedRoutes from "../pages/ProtectedRoutes";
 
-const App = lazy(() => import("../app/App"))
 const EmailsTab = lazy(() => import("../app/EmailsTab"))
 const TasksTab = lazy(() => import("../app/TasksTab"))
 const Emails = lazy(() => import("../emails/Emails"))
-const Tasks = lazy(() => import("../tasks/Tasks"))
+const Projects = lazy(() => import("../tasks/Projects"))
 const ViewEmail = lazy(() => import("../emails/ViewEmail"))
-const ViewTask = lazy(() => import("../tasks/ViewTask"))
+const ViewProject = lazy(() => import("../tasks/ViewProject"))
 
 /**
- * Contains paths and elements to show for those paths:
- * main - Email, invalid - _, view - View Email
+ * Contains paths and elements to show for those paths
  */
 const routes = {
+    // Emails tab
     emails_tab: {
         path: "/emails",
         element: 
         <ProtectedRoutes>
-            {/* <App /> */}
             <EmailsTab />
         </ProtectedRoutes>
     },
@@ -36,7 +34,7 @@ const routes = {
             <ViewEmail />
         </ProtectedRoutes>
     },
-
+    // Tasks tab
     tasks_tab: {
         path: "/tasks",
         element: 
@@ -48,17 +46,17 @@ const routes = {
         path: "/tasks",
         element:
         <ProtectedRoutes>
-            <Tasks />
+            <Projects />
         </ProtectedRoutes>
     },
     view_task: {
         path: "/tasks/view",
         element: 
         <ProtectedRoutes>
-            <ViewTask />
+            <ViewProject />
         </ProtectedRoutes>
     },
-    
+    // Invalid URL
     invalid: {
         path: "/*",
         // Something to show when route in URL is invalid

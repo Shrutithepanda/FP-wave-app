@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Box, Button, Dialog, FormControl, IconButton, InputBase, InputLabel, MenuItem, Select, styled, Typography } from "@mui/material"
+import dayjs from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import { Trash3, XLg } from "react-bootstrap-icons"
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { XLg } from "react-bootstrap-icons"
 
+import { TASK_API_URLS } from "../services/api.urls"
 import { useAuth } from "../hooks/AuthProvider"
 import useApi from "../hooks/useApi"
-import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
 
 const dialogStyle = {
@@ -17,7 +18,7 @@ const dialogStyle = {
     boxShadow: "none",
     borderRadius: "10px",
     background: Colours.container,
-    alignSelf: "flex-start",
+    alignSelf: "flex-start"
 }
 
 const Header = styled(Box) ({
@@ -55,50 +56,51 @@ const Footer = styled(Box) ({
 })
 
 /**
- * Create a task in the database
- * @param {boolean} openDialog 
+ * Update a task
+ * @param {boolean} openDialog
  * @param {function} setOpenDialog 
  * @param {int} projectId 
- * @returns a dialog containing input fields for creating a task
+ * @param {object} task 
+ * @returns a dialog containing input fields (pre-filled) to update a task
  */
-const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
-    const [data, setData] = useState({})
+const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
+    const [data, setData] = useState(task)
     const [status, setStatus] = useState("")
+
+    // Destructure the user object from useAuth hook - for user id
     const { user } = useAuth()
 
-    // Initialise create task service 
-    const createTaskService = useApi(TASK_API_URLS.createTask)
-
+    // Initialise the update task service 
+    const updateTaskService = useApi(TASK_API_URLS.updateTask)
 
     /**
-     * Close the dialog and set the fields back to their initial values
+     * Close the dialog with previous data
      * @param {*} e 
      */
-    const closeComposeMail = (e) => {
+    const closeDialog = (e) => {
         e.preventDefault() 
         setOpenDialog(false)
-        setData({})
-        setStatus("")
+        setData(task)
     }
 
     /**
-     * Close the dialog when clicked outside
+     * Close when clicked outside of the dialog. Keep the previous data.
      */
     const closeOnClickAway = () => {
         setOpenDialog(false)
-        setData({})
-        setStatus("")
+        setData(task)
     }
 
     /**
-     * Create a task in the Tasks table with the required fields
+     * Update a task in the Tasks table with the required fields
      * @param {*} e 
      */
-    const createTask = (e) => {
+    const updateTask = (e) => {
         e.preventDefault()
         
-        // Data to be inserted in the table
+        // Data to be updated in the table
         const body = {
+            id: task.id,
             user_id: user?.id,
             project_id: projectId,
             task_name: data?.task_name,
@@ -108,12 +110,13 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
         }
 
         // Call the API and pass the body as a parameter
-        createTaskService.call(body)
+        updateTaskService.call(body)
         
-        // If no error is returned, close the dialog box, set data to an empty object and reload
-        if (!createTaskService?.error) {
+        // If no error is returned, close the dialog box, set data to the updated data and reload
+        if (!updateTaskService?.error) {
             setOpenDialog(false)
-            setData({})
+            setData(data)
+            
             window.location.reload()
         }
         else {
@@ -126,22 +129,15 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
      * Set the data to the data entered in the input fields
      * @param {*} e 
      */
-    const onValueChange = (e) => {
+    const onValueChange = (e) => {        
         // Store value and name based on the DateTimePicker or TextFields
-        const value = e?.target ? e.target.value : e.$d
         const fieldName = e?.target ? e.target.name : "due_date"
+        const value = e?.target ? e.target.value : e.$d
 
-        // Set the status to the value
-        if (fieldName === "status") setStatus(value)
-        
-        if (value === "" || value === null) {
-            // If there is no value in the fields then set the data to an empty object
-            setData({});
-        } else {
-            // Otherwise set the data to the data entered in the fields
-            setData({ ...data, [fieldName]: value });
-        }
-        
+        if (fieldName === "status") setStatus(e?.target.value)
+
+        // Set the data to the data entered in the fields
+        setData({ ...data, [fieldName]: value })        
     }
 
     return (
@@ -151,30 +147,30 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
                 onClose = { closeOnClickAway }
                 PaperProps = {{ sx: dialogStyle }}
             >
-                {/* Header containing dialog heading and close button */}
+                {/* Header containing dialog title and close button */}
                <Header>
-                    <Typography>New task</Typography>
-                    <IconButton onClick = {(e) => closeComposeMail(e)}>
+                    <Typography>Update task</Typography>
+                    <IconButton onClick = { (e) => closeDialog(e) }>
                         <XLg size = {15} color = "#000" />
                     </IconButton>
                </Header>
 
-                {/* Input fields */}
+                {/* Input container */}
                <FieldWrapper>
                     {/* Task name */}
                     <InputBase 
-                        placeholder = "Task name" 
+                        value = { data.task_name } 
                         name = "task_name" 
                         onChange = { (e) => onValueChange(e) } 
                     />
 
-                    {/* Status menu */}
+                    {/* Status */}
                     <FormControl>
                         <InputLabel>Status</InputLabel>
                         <Select
                             label = "Status"
                             name = "status"
-                            value = { status }
+                            value = { data.status }
                             onChange = { (e) => onValueChange(e) }
                         >
                             <MenuItem value = {"Not started"}>Not started</MenuItem>
@@ -184,35 +180,28 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
                         </Select>
                     </FormControl>
 
-                    {/* Data time picker */}
+                    {/* Date time picker */}
                     <LocalizationProvider dateAdapter = { AdapterDayjs }>
-                            <DateTimePicker 
-                                label = "Due date" 
-                                disablePast = {true}
-                                format = "DD/MM/YYYY hh:mm a"
-                                name = "due_date"
-                                onChange = { (e) => onValueChange(e) }
-                            />
+                        <DateTimePicker 
+                            label = "Due date" 
+                            disablePast = {true}
+                            format = "DD/MM/YYYY hh:mm a"
+                            name = "due_date"
+                            value = { dayjs(data.due_date) }
+                            onChange = { (e) => onValueChange(e) }
+                        />
                     </LocalizationProvider>
                </FieldWrapper>
 
-                {/* Footer containing create and delete button */}
+                {/* Footer containing the update button */}
                <Footer>
-                    <SendButton onClick = { (e) => createTask(e) }>
-                        Create
+                    <SendButton onClick = { (e) => updateTask(e) } >
+                        Update
                     </SendButton>
-
-                    <IconButton>
-                        <Trash3 
-                            onClick = { () => { setOpenDialog(false); setStatus(false) } } 
-                            size = {20} 
-                            color = {Colours.error} 
-                        />
-                    </IconButton>
                </Footer>
             </Dialog>
         </Box>
     )
 }
 
-export default ComposeTask
+export default UpdateTask

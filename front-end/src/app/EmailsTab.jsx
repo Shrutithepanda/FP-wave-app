@@ -8,6 +8,8 @@ import Loader from "../customComponents/Loader"
 
 const EmailsTab = () => {
     const [openSidebar, setOpenSidebar] = useState(true)  
+
+    // Toggle sidebar's open state
     const toggleSidebar = () => setOpenSidebar(prevState => !prevState)
 
     return (
@@ -17,7 +19,8 @@ const EmailsTab = () => {
             
             {/* Sidebar and content in the pages */}
             <Box>
-                <SideBar openSidebar = {openSidebar} />
+                <SideBar openSidebar = {openSidebar} tasks = {false} />
+
                 {/* Fallback to the loader component until children (lazy loaded) are rendered */}
                 <Suspense fallback = {<Loader/>} >
                     <Outlet context = {{ openSidebar }} />

@@ -75,7 +75,7 @@ const ConfirmationModal = ({ openConfirmation, setOpenConfirmation, confirm, set
                <Header>
                     <Typography>Delete</Typography>
                     <IconButton onClick = {(e) => closeDialog(e)} >
-                        <XLg size = {12} color = "black" />
+                        <XLg size = {12} color = "#000" />
                     </IconButton>
                </Header>
 

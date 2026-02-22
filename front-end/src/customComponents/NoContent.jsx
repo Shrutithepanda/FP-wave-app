@@ -1,4 +1,5 @@
 import { Box, Divider, styled, Typography } from "@mui/material"
+import { Colours } from "../constants/colours"
 
 const Component = styled(Box) ({
     display: "flex",
@@ -11,10 +12,15 @@ const Component = styled(Box) ({
 
 const StyledDivider = styled(Divider) ({
     width: "100%",
-    marginTop: 10
+    marginTop: 10,
 })
 
-const NoMails = ({ message }) => {
+/**
+ * 
+ * @param {object} message 
+ * @returns a component containing message to show when there is no content in the page
+ */
+const NoContent = ({ message }) => {
     return (
         <Component>
             <Typography>{message?.heading}</Typography>
@@ -24,4 +30,4 @@ const NoMails = ({ message }) => {
     )
 }
 
-export default NoMails
+export default NoContent

@@ -1,48 +1,40 @@
 import React, { useContext, createContext, useState, useEffect } from 'react'
 import supabase from '../supabase/supabaseClient'
-// import { useNavigate } from 'react-router-dom'
 import Loader from '../customComponents/Loader'
 
 // Create auth context
-// const AuthContext = createContext()
-const AuthContext = createContext({user: null})
+const AuthContext = createContext({ user: null })
 
 /**
  * 
- * @returns an Auth context provider to wrap the App component around
+ * @returns an Auth context provider to wrap the app components around
  */
-const AuthProvider = ({children}) => {
-    // const navigate = useNavigate()
+const AuthProvider = ({ children }) => {
     const [session, setSession] = useState(undefined)
     const [user, setUser] = useState(null)
     const [authenticated, setAuthenticated] = useState(null)
     const [loading, setLoading] = useState(null)
 
     /**
-     * 
+     * Login a user with email and password
      * @param {*} email 
      * @param {*} password 
-     * Navigate to Emails page if the user is not null
+     * @returns success state and data or error
      */
     const login = async (email, password) => {
-        const {data, error} = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
         })
 
         
         if (error) {
-            return {success: false, error: error.message}
-            // throw error
+            return { success: false, error: error.message }
         }
-        // if (data?.user !== null) {
         if (data) {
-            // console.log(data)
-            // navigate("/")
-
             setUser(data.user)
             setAuthenticated(true)
-            return {success: true, data}
+            return { success: true, data }
         }
         
     }
@@ -51,48 +43,34 @@ const AuthProvider = ({children}) => {
      * Log the user out and set user and authenticated to null
      */
     const logout = async () => {
-        const {error} = await supabase.auth.signOut()
+        const { error } = await supabase.auth.signOut()
 
-        if (error) console.log(error)
-        // if (error) throw error
+        if (error) throw error
         
         setUser(null)
         setAuthenticated(false)
-        
     }
     
     /**
-     * 
+     * Register a new user 
      * @param {*} email 
      * @param {*} password 
-     * Register the user and log in the user if session exists
+     * @returns success state and data or error
      */
     const register = async (email, password) => {
-        // const {data: {session}, error} = await supabase.auth.signUp({
-        //     email,
-        //     password
-        // })
-        
-        // if (session) {
-            
-        //     await login(email, password)
-        // }
-        const {data, error} = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password
         })
         
         if (error) {
-            // throw error
-            return {success: false, error: error.message}
+            return { success: false, error: error.message }
         }
 
-        return {success: true, data}
+        return { success: true, data }
     }
 
     useEffect(() => {
-        // setLoading(true)
-
         /**
          * Get the details for the current user. 
          * Set user to the data and authenticated to true.
@@ -103,15 +81,13 @@ const AuthProvider = ({children}) => {
             setUser(currentUser ?? null)
             setAuthenticated(true)
             setLoading(false)
-            // console.log(data)
         }
         getUser()
 
         supabase.auth.getSession()
         .then(
-            ({data: {session}}) => {
+            ( {data: { session }} ) => {
                 setSession(session)
-                // console.log(session.user)
             }
         )
         
@@ -136,13 +112,12 @@ const AuthProvider = ({children}) => {
         <AuthContext.Provider
             value = {{ user, authenticated, session, login, logout, register }}
         >
-            {/* {loading === false && children} */}
-            {loading === false ? children : <Loader/>}
+            { loading === false ? children : <Loader/> }
         </AuthContext.Provider>
     )
 }
 
 export default AuthProvider
 
-// Create a custom hook - useAuth
+// Custom hook 
 export const useAuth = () => useContext(AuthContext)

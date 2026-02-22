@@ -1,8 +1,4 @@
 import React from 'react'
-// import { Link } from 'react-router-dom'
-// import Container from 'react-bootstrap/Container'
-// import Card from 'react-bootstrap/Card'
-// import Button from 'react-bootstrap/Button'
 import { Box, Card, Link, styled, Typography } from '@mui/material'
 import { Colours } from '../constants/colours'
 
@@ -36,7 +32,6 @@ const ContentContainer = styled(Box) ({
     textTransform: "none",
     textDecoration: "none",
     color: "#fff",
-    // backgroundColor: "#42458A",
     backgroundColor: Colours.primary,
     borderRadius: 7,
   }
@@ -46,7 +41,7 @@ const ContentContainer = styled(Box) ({
  * 
  * @returns the layout of the homepage with links to Login and Register pages
  */
-function HomePage() {
+const HomePage = () => {
   return (
     <MainContainer>
       <StyledContainer> 
@@ -60,19 +55,6 @@ function HomePage() {
       </StyledContainer>
 
     </MainContainer>
-    // <Container className = "d-flex justify-content-center Main-content-" > 
-    //   <Card className = "align-self-center shadow">
-    //     <Card.Body className = "m-5 Headings-" >
-    //       <h1>Wave</h1>
-    //       <p>Emotion-aware Email and Task Manager</p>
-
-    //       <div className="d-grid gap-2 Links-container-" >
-    //         <Button href = "/login" variant = "primary" className = "btn btn-primary Links-" >Login</Button>
-    //         <Button href = "/register" variant = "primary" className = "btn btn-primary Links-" >Register</Button>
-    //       </div>
-    //     </Card.Body>
-    //   </Card>
-    // </Container>
   )
 }
 

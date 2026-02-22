@@ -1,189 +1,139 @@
-import { Box, Checkbox, colors, IconButton, styled, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
-import { Outlet, useNavigate } from "react-router-dom"
-import { routes } from "../constants/routes"
-import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
-import { EMAIL_API_URLS, TASK_API_URLS } from "../services/api.urls"
-import useApi from "../hooks/useApi"
+import { Box, IconButton, styled, Typography } from "@mui/material"
+import { CircleFill, Pencil, XLg } from "react-bootstrap-icons"
 import { Colours } from "../constants/colours"
+import { useEffect } from "react"
+import { useState } from "react"
+import UpdateTask from "../customComponents/UpdateTask"
+import { TASK_API_URLS } from "../services/api.urls"
+import useApi from "../hooks/useApi"
 
 const Wrapper = styled(Box) ({
     display: "flex",
     alignItems: "center",
-    padding: "0 0 0 10px",
-    marginBottom: 3,
-    // backgroundColor: "#F2F6FC",
-    cursor: "pointer",
+    justifyContent: "space-around",
+    flexDirection: "row",
+    width: "95%",
+    flexGrow: 1,
+    padding: "5px 15px",
+    marginTop: 10,
+    borderRadius: 10,
+    background: Colours.cardBg,
     "& > div": {
-        display: "flex",
-        width: "100%",
-        flexGrow: 1,
-        // flexWrap: "wrap",
-        "& > p": {
-            fontSize: 15,
-            // overflow: "hidden", 
-            // whiteSpace: "nowrap", 
-            // textOverflow: "ellipsis"
-        }
+        margin: "0 0"
     }
 })
 
 const Indicator = styled(Box) ({
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
     color: "#222",
     padding: "0 7px",
+    margin: "0 10px",
     textWrap: "nowrap",
-    borderRadius: "15px 0 0 15px",
-    height: 25,
-    width: "95px !important",
+    borderRadius: 20,
+    height: 23,
+    width: "110px !important",
     "& > p": {
-        fontSize: "14px !important",
+        fontSize: "15px !important",
     }
 })
 
-const Date = styled(Typography) ({
-    marginLeft: "auto",
-    marginRight: 20,
-    fontSize: "12px !important",
-    color: "#404142"
+const Texts = styled(Box) ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    width: "90%",
+    overflow: 'hidden',
+    "& > p": {
+        width: "30%",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
 })
 
-const StyledText = styled(Box) ({
-    display: "flex", 
-    flexDirection: "row", 
-    // overflow: "hidden", 
-    // width: "90%", whiteSpace: "nowrap", textOverflow: "ellipsis", 
-    // background: "pink"
-    // color: "#424242"
-})
-
-const Task = ({ project, selectedTasks, setSelectedTasks, type, setRefresh }) => {
-    const navigate = useNavigate()
+/**
+ * Tasks for a project
+ * @param {object} task 
+ * @param {int} projectId 
+ * @returns tasks
+ */
+const Task  = ({ task, projectId }) => {
     const [indicatorColor, setIndicatorColor] = useState(Colours.notStartedBg)
-    const [barColor, setBarColor] = useState(Colours.notStartedCircle)
-    const toggleHighPriorityService = useApi(TASK_API_URLS.toggleHighPriorityProjects)
+    const [circleColor, setCircleColor] = useState(Colours.notStartedCircle)
+    const [loading, setLoading] = useState(false)
+    const [openDialog, setOpenDialog] = useState(false)
+    const update = () => setOpenDialog(true)
+    
+    // Initialise service
+    const deleteTaskService = useApi(TASK_API_URLS.deleteTask)
 
-    const toggleHighPriorityTasks = () => {
-        toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
-        setRefresh(prevState => !prevState)
+    /**
+     * Delete a task
+     */
+    const deleteTask = async () => {
+        // setLoading(true)
+        await deleteTaskService.call({ id: task.id })
         window.location.reload()
+        // setLoading(false)
     }
-
-    const onValueChange = () => {
-        // If selected emails already contain this email then filter this one out of the selected emails
-        if (selectedTasks.includes(project.id)) {
-            setSelectedTasks(prevState => prevState.filter(id => id != project.id))
-        }
-        // If selected emails do not have this email, append this email to the selected emails
-        else {
-            setSelectedTasks(prevState => [...prevState, project.id])
-
-        }
-    }
-
-    const changeIndicatorColor = () => {
-        if (project.status === "In progress") {
-            setIndicatorColor(Colours.inProgressBg)
-            setBarColor(Colours.inProgressCircle)
-        }
-        if (project.status === "Completed") {
-            setIndicatorColor(Colours.completedBg)
-            setBarColor(Colours.completedCircle)
-        }
-        if (project.status === "Pending") {
-            setIndicatorColor(Colours.pendingBg)
-            setBarColor(Colours.pendingCircle)
-        }
-    }
-
+    
     useEffect(() => {
+        /**
+         * Change indicator colour of tasks based on their status
+         */
+        const changeIndicatorColor = () => {
+            if (task.status === "In progress") {
+                setIndicatorColor(Colours.inProgressBg)
+                setCircleColor(Colours.inProgressCircle)
+            }
+            if (task.status === "Completed") {
+                setIndicatorColor(Colours.completedBg)
+                setCircleColor(Colours.completedCircle)
+            }
+            if (task.status === "Pending") {
+                setIndicatorColor(Colours.pendingBg)
+                setCircleColor(Colours.pendingCircle)
+            }
+        }
         changeIndicatorColor()
-    }, [type])
+    }, [])
 
     return (
-        <Wrapper
-            sx = {{ background: Colours.cardBg }}
-        >
-            <Checkbox 
-                size = "small" 
-                // checked if the id value exists in the array - selectedEmails
-                checked = {selectedTasks.includes(project.id)} 
-                onChange = {() => onValueChange()}
+        <Wrapper>
+            {/* Edit button */}
+            <IconButton onClick = { update }>
+                <Pencil size = {15} color = "#000" />
+            </IconButton>
+
+            {/* Task name, due data and indicator */}
+            <Texts>
+                <Typography>{task.task_name}</Typography>
+
+                <Typography>
+                    { (new window.Date(task.due_date)).toLocaleDateString() }&nbsp;
+                    { (new window.Date(task.due_date)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
+                </Typography>
+                
+                <Indicator sx = {{ backgroundColor: indicatorColor }} >
+                    <CircleFill size = {10} color = { circleColor } style = {{ marginRight: 5 }} />
+                    <Typography>{task.status}</Typography>
+                </Indicator>
+            </Texts>
+
+            {/* Delete task button */}
+            <IconButton onClick = { deleteTask }>
+                <XLg size = {15} color = "#000" />
+            </IconButton>
+
+            {/* Update task model */}
+            <UpdateTask 
+                openDialog = { openDialog } 
+                setOpenDialog = { setOpenDialog } 
+                task = { task } 
+                projectId = { projectId } 
             />
-            {project.priority === true
-                ? <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
-                    <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} />
-                </IconButton>
-                : <IconButton size = "small" onClick = {() => toggleHighPriorityTasks()} sx = {{marginRight: 1}}>
-                    <Bookmark size = {20} style = {{flexShrink: 0}} />
-                </IconButton>
-            }
-
-            <Box 
-                onClick = {
-                    // Route to ViewEmail component path
-                    () => {
-                        navigate(
-                            routes.view_task.path, 
-                            // Share the email with the component
-                            {state: {project: project}}
-                        )
-                    }
-                }
-                sx = {{
-                    width: "100%", 
-                    minWidth: 0, 
-                    display: "flex", 
-                    flexDirection: "column", 
-                    alignItems: "flex-start", 
-                    justifyContent: "space-between", 
-                    flexGrow: 1, 
-                    paddingTop: 1, 
-                    paddingBottom: 1
-                }}
-            >
-                <Box sx = {{width: "100%", minWidth: 0, display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <Typography>{project.title}</Typography>
-                        <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
-                            <Date>
-                                {(new window.Date(project.due_date)).getDate()}&nbsp;
-                                {(new window.Date(project.due_date)).toLocaleDateString("default", {month: "short"})}, &nbsp;
-                                {(new window.Date(project.due_date)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
-                            </Date>
-                            <Indicator
-                                sx = {{backgroundColor: indicatorColor, borderRight: `0px solid ${barColor}`}}
-                            >
-                                {/* <CircleFill size = {10} color = {circleColor} style = {{marginRight: 5}} /> */}
-                                <Typography>
-                                    {project.status}
-                                </Typography>
-                            </Indicator>
-                        </Box>
-                    </Box>
-
-                    <StyledText
-                        sx = {{
-                            width: "95%",
-                            minWidth: 0, 
-                            overflow: "hidden",
-                        }}
-                    >
-                        <Box>
-                            <Typography 
-                                sx = {{
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                    fontWeight: "normal", 
-                                }}
-                            >
-                                {project.description}
-                            </Typography>                            
-                        </Box>
-                    </StyledText>
-            </Box>
         </Wrapper>
     )
 }

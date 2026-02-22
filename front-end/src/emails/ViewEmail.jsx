@@ -50,29 +50,45 @@ const Date = styled(Box) ({
     color: "#5E5E5E"
 })
 
+/**
+ * 
+ * @returns a view page for an email
+ */
 const ViewEmail = () => {
+    // Outlet context to open/close sidebar
     const { openSidebar } = useOutletContext()
 
+    // Stressed state from useEmotion hook
     const { stressed } = useEmotion()
 
-    // Extract the email from the router's state
+    // Get the email from the router's state
     const { state } = useLocation()
     const { email } = state
 
+    // Initialise the services
     const moveEmailsToTrashService = useApi(EMAIL_API_URLS.moveEmailsToTrash)
     const toggleHighPriorityService = useApi(EMAIL_API_URLS.toggleHighPriorityEmails)
 
+    /**
+     * Move email to trash
+     */
     const deleteEmail = () => {
         moveEmailsToTrashService.call([email.id])
         window.history.back()
     }
 
+    /**
+     * Mark the email as important or un-important
+     */
     const toggleHighPriorityMails = () => {
         toggleHighPriorityService.call({ id: email.id, priority: !email.priority })
         // setRefresh(prevState => !prevState)
         window.location.reload()
     }
 
+    /**
+     * Refresh page
+     */
     const handleRefresh = () => {
         window.location.reload()
     }
@@ -83,74 +99,77 @@ const ViewEmail = () => {
                 ? {
                     marginLeft: 158, 
                     marginRight: 30,
-                    width: "calc(100% - 188px)",  // -158 px for sidebar's width + space for shadow, marginLeft prev. -> 150
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
+                    width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
+                    boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
                     height: "calc(100vh - 70px)", // -70px for header's height,
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
-                    background: "#F9F9F9"
+                    background: Colours.container
                 } 
                 : {
                     marginLeft: 30, 
                     marginRight: 30,
                     width: "calc(100% - 60px)",
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
+                    boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
                     height: "calc(100vh - 70px)",
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
-                    background: "#F9F9F9"
+                    background: Colours.container
                 }
             } 
         >
+            {/* Back and refresh buttons */}
             <IconWrapper>
-                <IconButton onClick = {() => window.history.back()}>
+                <IconButton onClick = { () => window.history.back() }>
                     <ArrowLeft size = {20} aria-label = "back" />
                 </IconButton>
                     
-                <span style = {{marginLeft: "auto", marginRight: 15}}>
-                    <IconButton onClick = {handleRefresh}>
-                        <ArrowClockwise size = {20} color = "black" aria-label = "reload" />
+                <span style = {{ marginLeft: "auto", marginRight: 15 }}>
+                    <IconButton onClick = { handleRefresh }>
+                        <ArrowClockwise size = {20} color = "#000" aria-label = "reload" />
                     </IconButton>
                 </span>
             </IconWrapper>
 
+            {/* Email title, folder name, bookmark button, and delete button */}
             <Subject>
                 {email.subject}
                 
-                <Indicator component = "span" >{email.folder}</Indicator>
+                <Indicator component = "span">{email.folder}</Indicator>
                 
-                {email.priority === true
-                    ? <IconButton style = {{marginLeft: 10}} onClick = {() => toggleHighPriorityMails()}>
+                { email.priority
+                    ? <IconButton style = {{ marginLeft: 10 }} onClick = { toggleHighPriorityMails }>
                         <BookmarkFill size = {20} color = {Colours.bookmark} />
                     </IconButton>
-                    : <IconButton style = {{marginLeft: 10}} onClick = {() => toggleHighPriorityMails()}>
+                    : <IconButton style = {{ marginLeft: 10 }} onClick = { toggleHighPriorityMails }>
                         <Bookmark size = {20} />
                     </IconButton>
                 }
-                <span style = {{marginLeft: "auto", marginRight: 40}}>
-                    <IconButton onClick = {() => deleteEmail()}>
-                        <Trash3 size = {20} color = {Colours.error} />
+                <span style = {{ marginLeft: "auto", marginRight: 40 }}>
+                    <IconButton onClick = { deleteEmail }>
+                        <Trash3 size = {20} color = { Colours.error } />
                     </IconButton>
                 </span>
             </Subject>
 
-            <Box style = {{display: "flex"}} >
-                <PersonCircle size = {30} color = "#79747E" style = {{margin: "8px 5px 0 20px"}} />
+            {/* Sender's email, date received, and email body */}
+            <Box style = {{ display: "flex" }}>
+                <PersonCircle size = {30} color = "#79747E" style = {{ margin: "8px 5px 0 20px" }}/>
                 <Container>
-                    <Box style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
-                        <Typography style = {{marginTop: 10, fontWeight: "bold"}} >
+                    <Box style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                        <Typography style = {{ marginTop: 10, fontWeight: "bold" }}>
                             {email.name}
-                            <Box component = "span" style = {{fontWeight: "normal"}}>&nbsp; - &nbsp;{email.send_to}</Box>
-                            {/* <Box component = "span" style = {{fontWeight: "normal"}}>&nbsp;&#60;{email.send_to}&#62;</Box> */}
+                            <Box component = "span" style = {{ fontWeight: "normal" }}>&nbsp; - &nbsp;{email.send_to}</Box>
                         </Typography>
+
                         <Date>
-                            {(new window.Date(email.created_at)).getDate()}&nbsp;
-                            {(new window.Date(email.created_at)).toLocaleDateString("default", {month: "short"})}&nbsp;
-                            {(new window.Date(email.created_at)).getFullYear()},&nbsp;
-                            {(new window.Date(email.created_at)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}
+                            { (new window.Date(email.created_at)).getDate() }&nbsp;
+                            { (new window.Date(email.created_at)).toLocaleDateString("default", { month: "short" }) }&nbsp;
+                            { (new window.Date(email.created_at)).getFullYear() },&nbsp;
+                            { (new window.Date(email.created_at)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
                         </Date>
                     </Box>
-                    <Typography style = {{marginTop: 20, marginRight: 30}} >{email.email_body}</Typography>
+                    <Typography style = {{ marginTop: 20, marginRight: 30 }}>{email.email_body}</Typography>
                 </Container>
             </Box>
         </Box>
