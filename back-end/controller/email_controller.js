@@ -16,8 +16,8 @@ export const getEmails = async (req, res) => {
         }
         else if (req.params.type === "important") {
             // If param type is important fetch records where the "important" value is true
-            const fromEmails = await Emails.fetchByPriorityFromEmails(req.headers.user)
-            const fromInbox = await Emails.fetchByPriorityFromInbox()
+            const fromEmails = await Emails.fetchByPriorityFromEmails(req.headers.user, true)
+            const fromInbox = await Emails.fetchByPriorityFromInbox(true)
             emails = fromEmails.concat(fromInbox)
         }
         else {
@@ -142,6 +142,67 @@ export const markEmailAsRead = async (req, res) => {
     } catch (error) {
         // Return status 500 Internal server error and error message
         console.log("controller, markAsRead: ", error.message)
+        res.status(500).json(error.message)
+    }
+}
+
+export const getUnimportantEmails = async (req, res) => {
+    try {
+        // const fromEmails = await Emails.fetchByPriorityFromEmails(req.headers.user, false)
+        // Fetch emails that are not marked important from the Inbox folder
+        const emails = await Emails.fetchByPriorityFromInbox(false)
+        // const emails = fromEmails.concat(fromInbox)
+
+        // Return status code 200 OK and emails object
+        return res.status(200).json(emails)
+        
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, archiveEmails: ", error.message)
+        res.status(500).json(error.message)
+    }
+}
+
+/**
+ * Move the emails requested to archive by setting the folder to archive for the matching records
+ * @param {object} req - id of the email(s) and folder name: archive
+ * @param {object} res 
+ * @returns a success response and emails moved to archive or an error response
+ */
+export const archiveEmails = async (req, res) => {
+    try {
+        // Call the archive emails function with the folder name set to archive 
+        // and ids for the rows to update the folder name for
+        const emails = await Emails.archiveEmails(req.body, "archives")
+
+        // Return status code 200 OK and the emails moved to archive
+        return res.status(200).json("emails moved to archives successfully", emails)
+
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, archiveEmails: ", error.message)
+        res.status(500).json(error.message)
+    }
+}
+
+/**
+ * Move the emails from archive to inbox by setting the folder to inbox for the matching records
+ * @param {object} req - id of the email(s) and folder name: archive
+ * @param {object} res 
+ * @returns a success response and emails moved back to inbox or an error response
+ */
+export const unArchiveEmails = async (req, res) => {
+    try {
+        // Call the archive emails function with the folder name set to inbox 
+        // and ids for the rows to update the folder name for
+        const emails = await Emails.archiveEmails(req.body, "inbox")
+
+        // Return status code 200 OK and the emails moved to archive
+        return res.status(200).json("emails moved back to inbox successfully", emails)
+
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, unArchiveEmails: ", error.message)
         res.status(500).json(error.message)
     }
 }

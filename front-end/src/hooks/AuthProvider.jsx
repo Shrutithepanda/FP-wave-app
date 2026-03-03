@@ -26,7 +26,6 @@ const AuthProvider = ({ children }) => {
             email: email,
             password: password,
         })
-
         
         if (error) {
             return { success: false, error: error.message }
@@ -112,7 +111,8 @@ const AuthProvider = ({ children }) => {
         <AuthContext.Provider
             value = {{ user, authenticated, session, login, logout, register }}
         >
-            { loading === false ? children : <Loader/> }
+            {/* { loading === false ? children : <Loader/> } */}
+            {children}
         </AuthContext.Provider>
     )
 }

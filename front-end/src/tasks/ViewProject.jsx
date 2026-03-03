@@ -73,7 +73,7 @@ const ViewProject = () => {
     
     // User object and stressed state
     const { user } = useAuth()
-    const { stressed } = useEmotion()
+    const { stressed, stressLevel } = useEmotion()
     
     // Extract the project from the router's state
     const { state } = useLocation()
@@ -160,7 +160,15 @@ const ViewProject = () => {
                     marginLeft: 158, 
                     marginRight: 30,
                     width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
+                    boxShadow: `0px 0px 10px 2px ${
+                        stressLevel === "low" 
+                        ? Colours.lowStressShadow 
+                        : stressLevel === "medium"
+                        ? Colours.mediumStressShadow
+                        : stressLevel === "high" 
+                        ? Colours.highStressShadow
+                        : Colours.normalShadow
+                    }`, 
                     height: "calc(100vh - 70px)", // -70px for header's height,
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
@@ -170,7 +178,15 @@ const ViewProject = () => {
                     marginLeft: 30, 
                     marginRight: 30,
                     width: "calc(100% - 60px)",
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "lightgreen" : Colours.normalShadow}`, 
+                    boxShadow: `0px 0px 10px 2px ${
+                        stressLevel === "low" 
+                        ? Colours.lowStressShadow 
+                        : stressLevel === "medium"
+                        ? Colours.mediumStressShadow
+                        : stressLevel === "high" 
+                        ? Colours.highStressShadow
+                        : Colours.normalShadow
+                    }`, 
                     height: "calc(100vh - 70px)",
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,

@@ -28,6 +28,18 @@ export const EMAIL_API_URLS = {
         endpoint: "read-email",
         method: "POST"
     },
+    getUnImportantEmails: {
+        endpoint: "unimportant-emails",
+        method: "GET"
+    },
+    archiveEmails: {
+        endpoint: "archive-emails",
+        method: "POST"
+    },
+    unArchiveEmails: {
+        endpoint: "unarchive-emails",
+        method: "POST"
+    }
 }
 
 // API URLS for Tasks tab
@@ -76,6 +88,10 @@ export const TASK_API_URLS = {
         endpoint: "delete-task",
         method: "DELETE"
     },
+    archiveProjects: {
+        endpoint: "archive-projects",
+        method: "POST"
+    }
 }
 
 // API URL for Emotion detection

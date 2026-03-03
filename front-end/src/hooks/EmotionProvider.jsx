@@ -14,9 +14,12 @@ const EmotionProvider = ({ children }) => {
     let canvasRef = useRef(null)
     const captureIntervalRef = useRef(null)
     
+    let idRef = useRef(0)
     const [camOn, setCamOn] = useState(false)
     const [emotions, setEmotions] = useState([{}])
+    const [emotionsInInterval, setEmotionsInInterval] = useState([])
     const [stressed, setStressed] = useState(false)
+    const [stressLevel, setStressLevel] = useState("normal")
 
     // Initialise the emotion detection service
     const detectEmotionsService = useApi(EMOTION_API_URLS.detectEmotions)
@@ -121,18 +124,56 @@ const EmotionProvider = ({ children }) => {
      * Infer stress from the emotion data received from the API
      */
     const calculateStress = () => {
-        const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-        const confidence = emotions[0]?.Confidence
+        const negativeEmotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
         const type = emotions[0]?.Type
-    
-        if (confidence > 30 && negative_emotions.includes(type)) 
-        {  
-            setStressed(true)
-            // console.log("Emotion: ", type, "\nConfidence: ", confidence)
-            // return stressed
+        const confidence = emotions[0]?.Confidence
+
+        // If type and confidence are not undefined, set emotions in interval to the current emotion
+        if (type && confidence) {
+            // console.log(idRef.current, type, confidence)
+            setEmotionsInInterval([{id: idRef.current++, Type: type, Confidence: confidence}, ...emotionsInInterval])
         }
-        else {
-            setStressed(false)
+
+        // If first 3 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to low
+        if (emotionsInInterval.length == 3) {
+            let negCount = 0
+            emotionsInInterval.forEach((emotion) => {
+                if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+            })
+            if (negCount >= 2) {
+                setStressed(true)
+                setStressLevel("low")
+            }
+        }
+        
+        // If first 6 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to medium
+        else if (emotionsInInterval.length == 6) {
+            let negCount = 0
+            emotionsInInterval.forEach((emotion) => {
+                if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+            })
+            if (negCount >= 4) {
+                setStressed(true)
+                setStressLevel("medium")
+            }
+        }
+
+        // If first 9 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to high
+        else if (emotionsInInterval.length == 9) {
+            let negCount = 0
+            emotionsInInterval.forEach((emotion) => {
+                if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+            })
+            if (negCount >= 5) {
+                setStressed(true)
+                setStressLevel("high")
+            }
+        }
+        
+        // Clean up. If length of the array is greater than 9, set values back to their initial values
+        if (emotionsInInterval.length >= 9) {
+            setEmotionsInInterval([])
+            idRef.current = 0
         }
     }
 
@@ -142,7 +183,8 @@ const EmotionProvider = ({ children }) => {
 
         // Capture and detect emotion through API call very 5 seconds
         if (camOn) {
-            captureIntervalRef.current = setInterval(captureAndDetectEmotions, 5000)
+            // Un-comment this line to capture and request the API to detect emotions
+            // captureIntervalRef.current = setInterval(captureAndDetectEmotions, 5000)
         }
         return () => clearInterval(captureIntervalRef.current)
 
@@ -152,15 +194,15 @@ const EmotionProvider = ({ children }) => {
         // If the emotions object contain more than an empty array, [{...}]
         if (emotions?.length > 1) {
             calculateStress()
-            console.log(`Emotion detected: ${emotions[0].Type, emotions[0].Confidence}`)
         }
     }, [emotions])
 
-    useEffect(() => {
-        // console.log("Stressed: ", stressed)
-    }, [stressed])
+    // Un-comment these lines to see the stressed state and stress levels on the console
+    // useEffect(() => {
+    //     console.log(`Stressed: ${stressed}, Level: ${stressLevel}`)
+    // }, [emotionsInInterval, stressed])
 
-    // ------- Code to detect stress from hard-coded emotions object every 5 seconds ------- 
+    // ================ Code to detect stress from hard-coded emotions object every 5 seconds ================
     // Current list in the dummy data
     const [currentEmotion, setCurrentEmotion] = useState([])
     // Current index
@@ -168,9 +210,9 @@ const EmotionProvider = ({ children }) => {
     // Dummy emotions data object - 9 lists
     const dummyEmotionData = [
         [
-            { Type: "HAPPY", Confidence: 99.34895324707031 },
+            { Type: "DISGUSTED", Confidence: 99.34895324707031 },
             { Type: "CALM", Confidence: 0.1007080078125 },
-            { Type: "DISGUSTED", Confidence: 0.04298686981201172 },
+            { Type: "HAPPY", Confidence: 0.04298686981201172 },
             { Type: "SURPRISED", Confidence: 0.007383525371551514 },
             { Type: "ANGRY", Confidence: 0.005424022674560547 },
             { Type: "CONFUSED", Confidence: 0.005284945480525494 },
@@ -198,12 +240,12 @@ const EmotionProvider = ({ children }) => {
             { Type: "HAPPY", Confidence: 0.00012715658522211015 },
         ],
         [
-            { Type: "CALM", Confidence: 43.30171203613281 },
+            { Type: "FEAR", Confidence: 43.30171203613281 },
             { Type: "ANGRY", Confidence: 28.564453125 },
             { Type: "SAD", Confidence: 11.224365234375 },
             { Type: "CONFUSED", Confidence: 1.57928466796875 },
             { Type: "DISGUSTED", Confidence: 0.884246826171875 },
-            { Type: "FEAR", Confidence: 0.2422332763671875 },
+            { Type: "CALM", Confidence: 0.2422332763671875 },
             { Type: "SURPRISED", Confidence: 0.017061829566955566 },
             { Type: "HAPPY", Confidence: 0.0018378099193796515 },
         ],
@@ -228,14 +270,14 @@ const EmotionProvider = ({ children }) => {
             { Type: "HAPPY", Confidence: 0.017468135803937912 },
         ],
         [
-            { Type : "FEAR", Confidence: 52.44140625 },
+            { Type : "HAPPY", Confidence: 52.44140625 },
             { Type : "CALM", Confidence: 15.5322265625 },
             { Type : "CONFUSED", Confidence: 14.9677734375 },
             { Type : "SAD", Confidence: 5.133056640625 },
             { Type : "ANGRY", Confidence: 3.5003662109375 },
             { Type : "DISGUSTED", Confidence: 2.41546630859375 },
             { Type : "SURPRISED", Confidence: 1.4715194702148438 },
-            { Type : "HAPPY", Confidence: 0.008980432525277138 },
+            { Type : "FEAR", Confidence: 0.008980432525277138 },
             
         ],
         [
@@ -262,73 +304,91 @@ const EmotionProvider = ({ children }) => {
 
     // Every 5 seconds, read the list at current index
     useEffect(() => {
+        // Un-comment out these lines to read current information from dummy emotion data
         if (camOn) {
             const interval = setInterval(() => {
                 setCurrentEmotion(dummyEmotionData[index])
                 setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
-            }, 2000)
+            }, 3000)
             // console.log(index)
             return () => clearInterval(interval)
         }
     }, [camOn, index])
 
     // Detect stress from the current emotion list
-    const [emotionsInInterval, setEmotionsInInterval] = useState([])
-    let idRef = useRef(0)
     useEffect(() => {
         /**
-         * 
+         * Sets stress levels to low, medium or high depending on whether most of the values
+         * in the array, emotionsInInterval, which contains the current emotion in each interval,
+         * are negative
          */
         const calculateDummyStress = () => {
-            const negative_emotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
-            
-            // CurrentEmotion's length is always > 0 so this keeps on running
-            // if (currentEmotion.length > 0) {
-
+            const negativeEmotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
             const type = currentEmotion[0]?.Type
             const confidence = currentEmotion[0]?.Confidence
 
-            // const { type, confidence } = currentEmotion[0]
-            
-            negative_emotions.forEach((emotion) => {
-                if (confidence > 40 && type === emotion) 
-                {  
-                    // setEmotionsInInterval((prev) => {
-                    //     const updatedArray = {...prev, type}
-                    //     if (updatedArray.length > 9) updatedArray.shift()
-                    // })
+            // If type and confidence are not undefined, set emotions in interval to the current emotion
+            if (type && confidence) setEmotionsInInterval([{id: idRef.current++, Type: type, Confidence: confidence}, ...emotionsInInterval])
 
-                    // if (emotionsInInterval.length <= 9) {
-                        // const primaryEmotion = {type: type, confidence: confidence}
-                        // setEmotionsInInterval((prev) => prev, primaryEmotion)
-                        // console.log(emotionsInInterval[0])
-                        setEmotionsInInterval([{id: idRef.current++, Type: type, Confidence: confidence}, ...emotionsInInterval])
-                    // }
-                    // ⚠️ Check if correct slice is returned
-                    if (emotionsInInterval.length > 9) {
-                        setEmotionsInInterval(emotionsInInterval.slice(0, 9))
-                    }
-                    // setStressed(true)
-                    // console.log(`${index} Emotion: ${type},  Confidence: ${confidence}`)
+            // If first 3 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to low
+            if (emotionsInInterval.length == 3) {
+                let negCount = 0
+                emotionsInInterval.forEach((emotion) => {
+                    if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+                })
+                if (negCount >= 2) {
+                    setStressed(true)
+                    setStressLevel("low")
                 }
-                
-            })
-            // }
+            }
+            
+            // If first 6 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to medium
+            else if (emotionsInInterval.length == 6) {
+                let negCount = 0
+                emotionsInInterval.forEach((emotion) => {
+                    if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+                })
+                if (negCount >= 4) {
+                    setStressed(true)
+                    setStressLevel("medium")
+                }
+            }
+
+            // If first 9 values emotions in interval has mostly negative emotions, set stressed to true and stressLevel to high
+            else if (emotionsInInterval.length == 9) {
+                let negCount = 0
+                emotionsInInterval.forEach((emotion) => {
+                    if (negativeEmotions.includes(emotion.Type)) negCount ++ 
+                })
+                if (negCount >= 5) {
+                    setStressed(true)
+                    setStressLevel("high")
+                }
+                else if (negCount < 5) {
+                    setStressed(false)
+                    setStressLevel("normal")
+                }
+            }
+            
+            // Clean up. If length of the array is greater than 9, set values back to their initial values
+            if (emotionsInInterval.length >= 9) {
+                setEmotionsInInterval([])
+                idRef.current = 0
+            }
         }
         
+        // Un-comment out this line to calculate stress on dummy data
         calculateDummyStress()
-        
-        // return () => setStressed(false)
-    // }, [currentEmotion, stressed])
-    }, [currentEmotion])
+    }, [currentEmotion]) // if current emotion stays the same this won't change
 
     useEffect(() => {
         // console.log("array:", emotionsInInterval)
-    }, [emotionsInInterval])
+        // console.log("Stress level:", stressLevel)
+    }, [emotionsInInterval, stressLevel])
     
     return (
         <EmotionContext.Provider
-            value = {{ stressed, camOn, startCapturing, stopCapturing, calculateStress }}
+            value = {{ camOn, stressed, stressLevel, startCapturing, stopCapturing, setStressed, setStressLevel }}
         >
             { children }
             {/* Render video and canvas outside the screen */}

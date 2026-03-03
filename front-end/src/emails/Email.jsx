@@ -56,7 +56,8 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
      */
     const toggleHighPriorityMails = () => {
         toggleHighPriorityService.call({ id: email.id, priority: !email.priority, type: type })
-        setRefresh(prevState => !prevState)
+        // The page reloads but a full reload is needed for the state change to reflect
+        // setRefresh((prev) => !prev)
         window.location.reload()
     }
 

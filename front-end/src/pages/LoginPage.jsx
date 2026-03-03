@@ -84,7 +84,7 @@ const LoginPage = () => {
       <Box sx = {{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
         <StyledCard>
           {/* Heading and link to Home page */}
-          <Typography variant = "h4" sx = {{ marginBottom: 10 }}>Login</Typography>
+          <Typography variant = "h4">Login</Typography>
           <Link href = "/" sx = {{ alignSelf: "flex-start" }}>Home</Link>
 
           {/* If there is a message, display it */}
@@ -126,7 +126,7 @@ const LoginPage = () => {
         
           {/* Link to the Resigter page */}
           <Typography>
-            Don't have an account yet? 
+            Don't have an account yet? &nbsp;
             <Link href = "/register">Register</Link>
           </Typography>
 

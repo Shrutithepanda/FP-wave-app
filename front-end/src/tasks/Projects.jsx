@@ -25,7 +25,7 @@ const Projects = () => {
 
   // User object and stressed state
   const { user } = useAuth()
-  const { stressed } = useEmotion()
+  const { stressed, stressLevel } = useEmotion()
 
   // Initialise services
   const getProjectsService = useApi(TASK_API_URLS.getProjects)
@@ -99,22 +99,38 @@ const Projects = () => {
               marginRight: 30,
               width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
               height: "calc(100vh - 70px)", // -70px for header's height,
-              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
-              transition: 'box-shadow 0.5s ease-in',
+              boxShadow: `0px 0px 10px 2px ${
+                stressLevel === "low" 
+                ? Colours.lowStressShadow 
+                : stressLevel === "medium"
+                ? Colours.mediumStressShadow
+                : stressLevel === "high" 
+                ? Colours.highStressShadow
+                : Colours.normalShadow
+              }`, 
+              transition: 'box-shadow 0.7s ease-in',
               borderTopLeftRadius: 25,
               borderTopRightRadius: 25,
-              background: Colours.background
+              background: Colours.container
             } 
             : {
               marginLeft: 30, 
               marginRight: 30,
               width: "calc(100% - 60px)", 
               height: "calc(100vh - 70px)",
-              boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
-              transition: 'box-shadow 0.5s ease-in',
+              boxShadow: `0px 0px 10px 2px ${
+                stressLevel === "low" 
+                ? Colours.lowStressShadow 
+                : stressLevel === "medium"
+                ? Colours.mediumStressShadow
+                : stressLevel === "high" 
+                ? Colours.highStressShadow
+                : Colours.normalShadow
+              }`, 
+              transition: 'box-shadow 0.7s ease-in',
               borderTopLeftRadius: 25,
               borderTopRightRadius: 25,
-              background: Colours.background
+              background: Colours.container
             }
         }
       >

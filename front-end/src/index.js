@@ -1,25 +1,25 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter, RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
+import React, { Suspense } from 'react'
+import { BrowserRouter, RouterProvider } from 'react-router-dom'
+import { router } from './router'
+import ReactDOM from 'react-dom/client'
+import reportWebVitals from './reportWebVitals'
 
 import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.js';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.js'
 
-import AuthProvider from './hooks/AuthProvider';
-import Loader from './customComponents/Loader';
-import EmotionProvider from './hooks/EmotionProvider';
+import AuthProvider from './hooks/AuthProvider'
+import Loader from './customComponents/Loader'
+import EmotionProvider from './hooks/EmotionProvider'
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
 
-    {/* Emotion wrapper */}
-    <EmotionProvider>
-      {/* Authentication wrapper */}
-      <AuthProvider>
+    {/* Authentication wrapper */}
+    <AuthProvider>
+      {/* Emotion wrapper */}
+      <EmotionProvider>
 
         {/* Fallback to a loading screen */}
         <Suspense fallback = { <Loader/> } >
@@ -27,8 +27,8 @@ root.render(
           <RouterProvider router = { router } />
         </Suspense>
 
-      </AuthProvider>
-    </EmotionProvider>
+      </EmotionProvider>
+    </AuthProvider>
     
   </React.StrictMode>
 );

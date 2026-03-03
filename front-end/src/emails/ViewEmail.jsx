@@ -1,11 +1,10 @@
 import { Box, IconButton, styled, Typography } from "@mui/material"
-import { Arrow90degLeft, ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, CaretLeft, PersonCircle, Trash3 } from "react-bootstrap-icons"
+import { ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, PersonCircle, Trash3 } from "react-bootstrap-icons"
 import { useLocation, useOutletContext } from "react-router-dom"
-import { useAuth } from "../hooks/AuthProvider"
-import useApi from "../hooks/useApi"
+
 import { EMAIL_API_URLS } from "../services/api.urls"
+import useApi from "../hooks/useApi"
 import { useEmotion } from "../hooks/EmotionProvider"
-import { useEffect } from "react"
 import { Colours } from "../constants/colours"
 
 const IconWrapper = styled(Box) ({
@@ -35,7 +34,6 @@ const Indicator = styled(Box) ({
 const Container = styled(Box) ({
     marginLeft: 15,
     width: "100%",
-    // display: "flex",
     "& > div": {
         display: "flex",
         "& > p > span": {
@@ -59,7 +57,7 @@ const ViewEmail = () => {
     const { openSidebar } = useOutletContext()
 
     // Stressed state from useEmotion hook
-    const { stressed } = useEmotion()
+    const { stressed, stressLevel } = useEmotion()
 
     // Get the email from the router's state
     const { state } = useLocation()
@@ -100,7 +98,15 @@ const ViewEmail = () => {
                     marginLeft: 158, 
                     marginRight: 30,
                     width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
+                    boxShadow: `0px 0px 10px 2px ${
+                        stressLevel === "low" 
+                        ? Colours.lowStressShadow 
+                        : stressLevel === "medium"
+                        ? Colours.mediumStressShadow
+                        : stressLevel === "high" 
+                        ? Colours.highStressShadow
+                        : Colours.normalShadow
+                    }`, 
                     height: "calc(100vh - 70px)", // -70px for header's height,
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
@@ -110,7 +116,15 @@ const ViewEmail = () => {
                     marginLeft: 30, 
                     marginRight: 30,
                     width: "calc(100% - 60px)",
-                    boxShadow: `2px 0px 10px 2px ${stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow}`, 
+                    boxShadow: `0px 0px 10px 2px ${
+    stressLevel === "low" 
+    ? Colours.lowStressShadow 
+    : stressLevel === "medium"
+    ? Colours.mediumStressShadow
+    : stressLevel === "high" 
+    ? Colours.highStressShadow
+    : Colours.normalShadow
+}`, 
                     height: "calc(100vh - 70px)",
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,

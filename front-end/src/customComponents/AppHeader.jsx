@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Search, List, Camera } from 'react-bootstrap-icons'
+import { Search, Camera, LayoutSidebar } from 'react-bootstrap-icons'
 import { AppBar, Toolbar, styled, InputBase, Box, Typography, IconButton } from '@mui/material'
 import { useEmotion } from '../hooks/EmotionProvider'
 import { NavLink } from 'react-router-dom'
@@ -68,7 +68,7 @@ const AppHeader = ({ toggleSidebar }) => {
     }
 
     // Get camera state (on/off), capturing functions and stressed value
-    const { camOn, startCapturing, stopCapturing, stressed } = useEmotion()
+    const { camOn, startCapturing, stopCapturing, stressed, stressLevel } = useEmotion()
 
     /**
      * Function to start and stop capturing
@@ -94,12 +94,9 @@ const AppHeader = ({ toggleSidebar }) => {
                     color = "inherit"
                     aria-label = "open sidebar"
                     sx = {{ mr: 2 }}
+                    onClick = { toggleSidebar } 
                 >
-                    <List 
-                        color = "#000" 
-                        size = {20} 
-                        onClick = { toggleSidebar } 
-                    />
+                    <LayoutSidebar color = "#000" size = {20}/>
                 </IconButton>
 
                 {/* App logo: renders for medium screen sizes and above */}
@@ -126,8 +123,16 @@ const AppHeader = ({ toggleSidebar }) => {
                     {/* Search bar */}
                     <SearchWrapper 
                         sx = {{
-                            boxShadow: `0px 1px 8px 1px ${ stressed ? "hsl(297, 67%, 80%)" : Colours.normalShadow }`,
-                            transition: 'box-shadow 0.5s ease-in'
+                            boxShadow: `0px 0px 10px 2px ${
+                                stressLevel === "low" 
+                                ? Colours.lowStressShadow 
+                                : stressLevel === "medium"
+                                ? Colours.mediumStressShadow
+                                : stressLevel === "high" 
+                                ? Colours.highStressShadow
+                                : Colours.normalShadow
+                            }`, 
+                            transition: 'box-shadow 0.7s ease-in'
                         }}
                     >
                         <InputBase 

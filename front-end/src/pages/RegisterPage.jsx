@@ -86,7 +86,7 @@ const RegisterPage = () => {
       <Box style = {{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
         <StyledCard>
           {/* Heading and link to the Home page */}
-          <Typography variant = "h4" style = {{ marginBottom: 10 }}>Register</Typography>
+          <Typography variant = "h4">Register</Typography>
           <Link href = "/">Home</Link>
           
 
@@ -129,7 +129,7 @@ const RegisterPage = () => {
 
           {/* Link to the Login page */}
           <Typography>
-            Already have an account? 
+            Already have an account? &nbsp;
             <Link href = "/login">Login</Link>
           </Typography>
 

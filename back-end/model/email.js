@@ -12,6 +12,7 @@ class Emails {
         const { data, error } = await supabase
         .from("Inbox")
         .select()
+        .eq("folder", "inbox")
         .order("created_at", { ascending: false })
 
         if (error) {
@@ -31,18 +32,35 @@ class Emails {
      */
     static async fetchByFolder (id, folder = "") {
         if (folder){
-            const { data, error } = await supabase
-            .from("Emails")
-            .select()
-            .eq("user_id", id)
-            .eq("folder", folder)
-            .order("created_at", { ascending: false })
-            
-            if (error) {
-                throw error
+            if (folder === "archives") {
+                const { data, error } = await supabase
+                .from("Inbox")
+                .select()
+                .eq("folder", folder)
+                .order("created_at", { ascending: false })
+                
+                if (error) {
+                    throw error
+                }
+                else {
+                    return data
+                }
+    
             }
             else {
-                return data
+                const { data, error } = await supabase
+                .from("Emails")
+                .select()
+                .eq("user_id", id)
+                .eq("folder", folder)
+                .order("created_at", { ascending: false })
+                
+                if (error) {
+                    throw error
+                }
+                else {
+                    return data
+                }
             }
         }
     }
@@ -52,12 +70,12 @@ class Emails {
      * @param {uuid} id - user_id
      * @returns data or error
      */
-    static async fetchByPriorityFromEmails (id) {
+    static async fetchByPriorityFromEmails (id, value) {
         const { data, error } = await supabase
         .from("Emails")
         .select()
         .eq("user_id", id)
-        .eq("priority", true)
+        .eq("priority", value)
         .order("created_at", { ascending: false })
         
         if (error) {
@@ -72,11 +90,11 @@ class Emails {
      * Fetch emails from Inbox table where priority is true.
      * @returns data or error
      */
-    static async fetchByPriorityFromInbox () {
+    static async fetchByPriorityFromInbox (value) {
         const { data, error } = await supabase
         .from("Inbox")
         .select()
-        .eq("priority", true)
+        .eq("priority", value)
         .order("created_at", { ascending: false })
         
         if (error) {
@@ -202,6 +220,21 @@ class Emails {
         }
         else {
             return data
+        }
+    }
+
+    static async archiveEmails (id, folder) {
+        const { data, error } = await supabase
+       .from("Inbox")
+       .update({ "folder": folder })
+       .in("id", id)
+       .select()
+       
+        if (error) {
+           throw error
+        }
+        else {
+           return data
         }
     }
 }

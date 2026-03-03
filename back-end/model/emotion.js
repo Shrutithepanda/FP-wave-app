@@ -40,7 +40,7 @@ class Emotions {
             else {
                 return error
             }
-
+            
             // Dummy emotion data
             const dummyEmotion = [
                 { Type: 'SAD', Confidence: 88.0078125 },

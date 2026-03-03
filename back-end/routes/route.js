@@ -6,7 +6,10 @@ import {
     moveEmailsToTrash, 
     toggleHighPriorityEmails, 
     deleteEmails, 
-    markEmailAsRead, 
+    markEmailAsRead,
+    getUnimportantEmails,
+    archiveEmails, 
+    unArchiveEmails
 } from "../controller/email_controller.js"
 
 import { 
@@ -43,6 +46,12 @@ routes.post("/important", toggleHighPriorityEmails)
 routes.delete("/completely-delete", deleteEmails)
 
 routes.post("/read-email", markEmailAsRead)
+
+routes.get("/unimportant-emails", getUnimportantEmails)
+
+routes.post("/archive-emails", archiveEmails)
+
+routes.post("/unarchive-emails", unArchiveEmails)
 
 // Routes for Tasks
 routes.get("/tasks/:type", fetchProjects)
