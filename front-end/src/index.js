@@ -8,7 +8,7 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.js'
 
-import AuthProvider from './hooks/AuthProvider'
+import AuthProvider, { useAuth } from './hooks/AuthProvider'
 import Loader from './customComponents/Loader'
 import EmotionProvider from './hooks/EmotionProvider'
 

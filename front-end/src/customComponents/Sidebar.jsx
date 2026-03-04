@@ -58,7 +58,6 @@ const Indicator = styled(Typography) ({
 const SideBar = ({ tasks = false, openSidebar }) => {
     const [openDialog, setOpenDialog] = useState(false)
     const [openProfile, setOpenProfile] = useState(false)
-    const [on, setOn] = useState(false)
 
     // Open dialogs when repsective buttons are clicked
     const onComposeClick = () => setOpenDialog(true)
@@ -68,14 +67,13 @@ const SideBar = ({ tasks = false, openSidebar }) => {
     const { type } = useParams()
 
     // Get current value of stressed
-    const { stressed, stressLevel, startCapturing, stopCapturing, setStressed, setStressLevel } = useEmotion()
+    const { camOn, stressed, stressLevel, startCapturing, stopCapturing, setStressed, setStressLevel } = useEmotion()
 
     /**
      * Turn adaptive mode on
      */
     const turnOn = () => {
         startCapturing()
-        setOn(true)
     }
 
     /**
@@ -85,7 +83,6 @@ const SideBar = ({ tasks = false, openSidebar }) => {
         stopCapturing()
         setStressLevel("normal")
         setStressed(false)
-        setOn(false)
     }
 
     return (
@@ -143,12 +140,12 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                     </List>
                     
                     {/* Indicator for Calm mode */}
-                    <Box sx = {{ marginTop: "calc(100vh - 450px)", alignSelf: "flex-end" }}>
+                    <Box sx = {{ marginTop: "calc(100vh - 460px)", alignSelf: "flex-end" }}>
                         <Indicator>
-                            <CircleFill size = {10} color = {stressed ? "#27CF4E" : "#666666"} />
+                            <CircleFill size = {10} color = {camOn ? "#27CF4E" : "#666666"} />
                             Adaptive Mode
                         </Indicator>
-                        { on
+                        { camOn
                             ? <Button 
                                 onClick = { turnOff }
                                 sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
@@ -163,7 +160,7 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                                 Turn on?
                             </Button>
                         }
-                        {stressLevel}
+                        { stressLevel }
                     </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}
@@ -227,12 +224,12 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                     </List>
 
                     {/* Indicator for Calm mode */}
-                    <Box sx = {{ marginTop: "calc(100vh - 460px)", alignSelf: "flex-end" }}>
+                    <Box sx = {{ marginTop: "calc(100vh - 460px)", alignSelf: "flex-end" }}>                        
                         <Indicator>
-                            <CircleFill size = {10} color = {stressed ? "#27CF4E" : "#666666"} />
+                            <CircleFill size = {10} color = {camOn ? "#27CF4E" : "#666666"} />
                             Adaptive Mode
                         </Indicator>
-                        { on
+                        { camOn
                             ? <Button 
                                 onClick = { turnOff }
                                 sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
@@ -247,7 +244,7 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                                 Turn on?
                             </Button>
                         }
-                        {stressLevel}
+                        { stressLevel }
                     </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}

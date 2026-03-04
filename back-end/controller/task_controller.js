@@ -227,3 +227,70 @@ export const deleteTask = async (req, res) => {
         res.status(500).json(error.message)
     }
 }
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+export const getUnimportantProjects = async (req, res) => {
+    try {
+        // Fetch projects that are not marked important from the Projects table
+        const projectsFromProjects = await Tasks.fetchUnimportantProjects(req.headers?.user)
+        const projectsFromArchives = await Tasks.fetchUnimportantProjectsFromArchives(req.headers?.user)
+        const projects = projectsFromProjects.concat(projectsFromArchives)
+
+        // Return status code 200 OK and projects object
+        return res.status(200).json(projects)
+        
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, getUnimportantProjects: ", error.message)
+        res.status(500).json(error.message)
+    }
+}
+
+/**
+ * Move the projects requested to archives by setting the folder to archives for the matching records
+ * @param {object} req - id of the project(s) and folder name: archives
+ * @param {object} res 
+ * @returns a success response and projects moved to archives or an error response
+ */
+export const archiveProjects = async (req, res) => {
+    try {
+        // Call the update folder name function with the folder name set to archives 
+        // and ids for the rows to update the folder name for
+        const projects = await Tasks.updateFolderName(req.body, "archives")
+
+        // Return status code 200 OK and the projects moved to archive
+        return res.status(200).json("projects moved to archives successfully", projects)
+
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, archiveEmails: ", error.message)
+        res.status(500).json(error.message)
+    }
+}
+
+/**
+ * Move the projects from archives to projects by setting the folder to projects for the matching records
+ * @param {object} req - id of the email(s) and folder name: archive
+ * @param {object} res 
+ * @returns a success response and projects moved back to inbox or an error response
+ */
+export const unArchiveProjects = async (req, res) => {
+    try {
+        // Call the update folder name function with the folder name set to projects 
+        // and ids for the rows to update the folder name for
+        const projects = await Tasks.updateFolderName(req.body, "projects")
+
+        // Return status code 200 OK and the projects moved to projects
+        return res.status(200).json("projects moved back to projects successfully", projects)
+
+    } catch (error) {
+        // Return status 500 Internal server error and error message
+        console.log("controller, unArchiveProjects: ", error.message)
+        res.status(500).json(error.message)
+    }
+}

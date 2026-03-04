@@ -168,6 +168,10 @@ const EmotionProvider = ({ children }) => {
                 setStressed(true)
                 setStressLevel("high")
             }
+            else if (negCount < 5) {
+                setStressed(false)
+                setStressLevel("normal")
+            }
         }
         
         // Clean up. If length of the array is greater than 9, set values back to their initial values
@@ -197,9 +201,13 @@ const EmotionProvider = ({ children }) => {
         }
     }, [emotions])
 
-    // Un-comment these lines to see the stressed state and stress levels on the console
+    // Un-comment these lines to see the current emotion and stress levels on the console
     // useEffect(() => {
-    //     console.log(`Stressed: ${stressed}, Level: ${stressLevel}`)
+    //     console.log(`${emotions[0]?.Type}`)
+    // }, [emotions])
+
+    // useEffect(() => {
+    //     console.log(`Len: ${emotionsInInterval.length} \nStress level: \n${stressLevel}`)
     // }, [emotionsInInterval, stressed])
 
     // ================ Code to detect stress from hard-coded emotions object every 5 seconds ================
@@ -310,7 +318,7 @@ const EmotionProvider = ({ children }) => {
                 setCurrentEmotion(dummyEmotionData[index])
                 setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
             }, 3000)
-            // console.log(index)
+
             return () => clearInterval(interval)
         }
     }, [camOn, index])

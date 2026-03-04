@@ -4,7 +4,6 @@ import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import { routes } from "./constants/routes"
-import { useAuth } from "./hooks/AuthProvider"
 
 // Lazy render the error component
 const ErrorComponent = lazy(() => import("./pages/ErrorComponent"))
@@ -20,7 +19,6 @@ export const router = createBrowserRouter(
             {/* Public routes */}
             <Route 
                 path =  "/" 
-                
                 element = { <HomePage/> } 
             />
 

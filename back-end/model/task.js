@@ -232,6 +232,51 @@ class Tasks {
             return newData
         }
     } 
+
+    /**
+     * 
+     * @param {*} id 
+     * @param {*} folder 
+     * @returns 
+     */
+    static async fetchUnimportantProjects (id) {
+       const { data, error } = await supabase
+       .from("Projects")
+       .select()
+       .eq("user_id", id)
+       .eq("folder", "projects")
+       .eq("priority", false)
+       .order("due_date", { ascending: true })
+       
+       if (error) {
+           throw error
+        }
+        else {
+            return data
+        }
+    }
+
+    /**
+     * 
+     * @param {*} id 
+     * @returns 
+     */
+    static async fetchUnimportantProjectsFromArchives (id) {
+       const { data, error } = await supabase
+       .from("Projects")
+       .select()
+       .eq("user_id", id)
+       .eq("folder", "archives")
+       .eq("priority", false)
+       .order("due_date", { ascending: true })
+       
+       if (error) {
+           throw error
+        }
+        else {
+            return data
+        }
+    }
 }
 
 export default Tasks

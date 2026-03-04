@@ -88,8 +88,16 @@ export const TASK_API_URLS = {
         endpoint: "delete-task",
         method: "DELETE"
     },
+    getUnImportantProjects: {
+        endpoint: "unimportant-projects",
+        method: "GET"
+    },
     archiveProjects: {
         endpoint: "archive-projects",
+        method: "POST"
+    },
+    unArchiveProjects: {
+        endpoint: "unarchive-projects",
         method: "POST"
     }
 }

@@ -38,13 +38,13 @@ const Emails = () => {
 
     // User object and stressed state
     const { user } = useAuth()
-    const { stressed, stressLevel } = useEmotion()
+    const { stressLevel } = useEmotion()
 
 
     // Email services
     const getEmailsService = useApi(EMAIL_API_URLS.getEmailFromType)
-    const moveEmailsToTrashService = useApi(EMAIL_API_URLS.moveEmailsToTrash)
     const deleteEmailService = useApi(EMAIL_API_URLS.deleteEmail)
+    const moveEmailsToTrashService = useApi(EMAIL_API_URLS.moveEmailsToTrash)
     const getUnimportantEmailsService = useApi(EMAIL_API_URLS.getUnImportantEmails)
     const archiveEmailsService = useApi(EMAIL_API_URLS.archiveEmails)
     const unArchiveEmailsService = useApi(EMAIL_API_URLS.unArchiveEmails)
@@ -66,10 +66,9 @@ const Emails = () => {
 
     useEffect(() => {
         /**
-         * Fetch emails not marked unimportant 
+         * Fetch emails not marked important 
          */
         const fetchUnimportantEmails = async () => {
-
             const emails = await getUnimportantEmailsService.call({}, "", user.id)
             setUnimportantEmails(emails)
         }
@@ -81,10 +80,6 @@ const Emails = () => {
         if (!moved) restructureEmails()
         if (stressLevel === "high") setOpenSnackbarHigh(true)
     }, [unimportantEmails, stressLevel])
-    
-    useEffect(() => {
-        // console.log(refresh)
-    }, [refresh])
 
     /**
      * Close the snackbar when X is pressed
@@ -166,7 +161,6 @@ const Emails = () => {
         if (unimportantEmails?.map(email => email.folder === "archives") && stressLevel === "normal") {
             await unArchiveEmailsService.call(emails)
             setMoved(false)
-            // setRefresh((prev) => !prev)
         }
     }
 

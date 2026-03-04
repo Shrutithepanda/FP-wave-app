@@ -146,19 +146,23 @@ export const markEmailAsRead = async (req, res) => {
     }
 }
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export const getUnimportantEmails = async (req, res) => {
     try {
-        // const fromEmails = await Emails.fetchByPriorityFromEmails(req.headers.user, false)
         // Fetch emails that are not marked important from the Inbox folder
         const emails = await Emails.fetchByPriorityFromInbox(false)
-        // const emails = fromEmails.concat(fromInbox)
 
         // Return status code 200 OK and emails object
         return res.status(200).json(emails)
         
     } catch (error) {
         // Return status 500 Internal server error and error message
-        console.log("controller, archiveEmails: ", error.message)
+        console.log("controller, getUnimportantEmails: ", error.message)
         res.status(500).json(error.message)
     }
 }
@@ -197,7 +201,7 @@ export const unArchiveEmails = async (req, res) => {
         // and ids for the rows to update the folder name for
         const emails = await Emails.archiveEmails(req.body, "inbox")
 
-        // Return status code 200 OK and the emails moved to archive
+        // Return status code 200 OK and the emails moved to inbox
         return res.status(200).json("emails moved back to inbox successfully", emails)
 
     } catch (error) {

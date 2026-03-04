@@ -51,6 +51,7 @@ const HomePage = () => {
 
           <Link href = "/login" variant = "button">Login</Link>
           <Link href = "/register" variant = "button">Register</Link>
+          <Link href = "/emails/inbox" variant = "button" style = {{ background: "none", color: "#000", border: `1px solid ${Colours.primary}` }}>Emails</Link>
         </ContentContainer>
       </StyledContainer>
 

@@ -23,6 +23,9 @@ import {
     updateTask,
     deleteProjects,
     deleteTask,
+    getUnimportantProjects,
+    archiveProjects, 
+    unArchiveProjects,
 } from "../controller/task_controller.js"
 
 import {
@@ -75,6 +78,12 @@ routes.post("/update-task", updateTask)
 routes.delete("/completely-delete-project", deleteProjects)
 
 routes.delete("/delete-task", deleteTask)
+
+routes.get("/unimportant-projects", getUnimportantProjects)
+
+routes.post("/archive-projects", archiveProjects)
+
+routes.post("/unarchive-projects", unArchiveProjects)
 
 // Routes for Emotions
 routes.post("/detect-emotions", detectEmotions)
