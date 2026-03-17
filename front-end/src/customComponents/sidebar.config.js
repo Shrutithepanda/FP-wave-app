@@ -1,5 +1,8 @@
 import { Archive, Send, Inbox, Trash3, FileEarmark, Bookmark, ViewList, Check2Circle } from 'react-bootstrap-icons'
 
+/**
+ * Sidebar content for Emails tab
+ */
 export const EMAIL_SIDERBAR_CONTENT = [
     {
         name: "inbox",
@@ -33,6 +36,9 @@ export const EMAIL_SIDERBAR_CONTENT = [
     },
 ]
 
+/**
+ * Sidebar content for Tasks tab
+ */
 export const TASK_SIDERBAR_CONTENT = [
     {
         name: "projects",

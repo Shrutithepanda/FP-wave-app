@@ -1,14 +1,15 @@
 import { useState } from "react"
-import { Box, Button, Dialog, IconButton, InputBase, styled, Typography } from "@mui/material"
+import { Box, Button, Dialog, Fade, IconButton, InputBase, Snackbar, styled, Typography } from "@mui/material"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import { Trash3, XLg } from "react-bootstrap-icons"
+import { Trash3, X, XLg } from "react-bootstrap-icons"
 
 import useApi from "../hooks/useApi"
 import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const dialogStyle = {
     display: "flex",
     flexGrow: 1,
@@ -61,9 +62,17 @@ const Footer = styled(Box) ({
  */
 const ComposeProject = ({ openDialog, setOpenDialog }) => {
     const [data, setData] = useState({})
+    const [error, setError] = useState("")
+    const [openSnackbar, setOpenSnackbar] = useState(false)
 
+    // Initialise services
     const createProjectService = useApi(TASK_API_URLS.createProject)
     const saveProjectToDraftService = useApi(TASK_API_URLS.saveProjectToDraft)
+
+    /**
+     * Close snackbar
+     */
+    const closeSnackbar = () => setOpenSnackbar(false)
 
     /**
      * Close the dialog and save the project to drafts if data is present
@@ -80,17 +89,27 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
             folder: "drafts"
         }
 
-        // Call the API and pass the body as a parameter
-        saveProjectToDraftService.call(body)
-        
-        // If no error is returned, close the dialog box and set data to an empty object
-        if (!saveProjectToDraftService?.error) {
+        // If no data is present, close the dialog
+        if (data?.title == undefined || data?.description == undefined || data?.due_date == undefined) {
             setOpenDialog(false)
-            setData({})
+            setError("")
         }
-        else {
-            // In case of error
-            setOpenDialog(true)
+        else if (data?.title && data?.description && data?.due_date) { // If data is present save to draft and notify the user
+            // Call the API and pass the body as a parameter
+            saveProjectToDraftService.call(body)
+            
+            // If no error is returned, close the dialog box, notify the user and set data to an empty object
+            if (!saveProjectToDraftService?.error) {
+                setOpenDialog(false)
+                setOpenSnackbar(true)
+                setData({})
+                setError("")
+            }
+            else {
+                // In case of error keep the dialog open and show the error
+                setOpenDialog(true)
+                setError(saveProjectToDraftService?.error)
+            }
         }
     }
 
@@ -100,6 +119,7 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
     const closeOnClickAway = () => {
         setOpenDialog(false)
         setData({})
+        setError("")
     }
 
     /**
@@ -117,18 +137,26 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
             folder: "projects"
         }
 
-        // Call the API and pass the body as a parameter
-        createProjectService.call(body)
-        
-        // If no error is returned, close the dialog box, set data to an empty object and reload
-        if (!createProjectService?.error) {
-            setOpenDialog(false)
-            setData({})
-            window.location.reload()
-        }
-        else {
-            // In case of error
+        // If empty data is being sent, display error
+        if (data?.title == undefined || data?.description == undefined || data?.due_date == undefined) {
             setOpenDialog(true)
+            setError("All fields must be filled")
+        }
+        else if (data?.title && data?.description && data?.due_date) { // If there is data in all fields ...
+            // Call the API and pass the body as a parameter
+            createProjectService.call(body)
+            
+            // If no error is returned, close the dialog box, set data to an empty object and reload
+            if (!createProjectService?.error) {
+                setOpenDialog(false)
+                setData({})
+                window.location.reload()
+            }
+            else {
+                // In case of error
+                setOpenDialog(true)
+                setError(createProjectService?.error)
+            }
         }
     }
 
@@ -162,7 +190,7 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
                <Header>
                     <Typography>New project</Typography>
                     <IconButton onClick = { (e) => closeComposeProject(e) }>
-                        <XLg size = {12} color = "#000" />
+                        <XLg size = {12} color = "#000" aria-label = "close compose dialog" />
                     </IconButton>
                </Header>
 
@@ -171,12 +199,14 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
                     {/* Title and description */}
                     <InputBase 
                         placeholder = "Project Title" 
+                        aria-placeholder = "Project Title"
                         name = "title" 
                         onChange = { (e) => onValueChange(e) } 
                         sx = {{ borderBottom: `1px solid ${Colours.cardBg}` }} 
                     />
                     <InputBase 
                         placeholder = "Description" 
+                        aria-placeholder = "Description"
                         name = "description" 
                         onChange = { (e) => onValueChange(e) } 
                     />
@@ -193,22 +223,43 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
                     </LocalizationProvider>
                </FieldWrapper>
 
-                {/* Footer containing create and delete button */}
+                {/* Footer containing error, create and delete button */}
                <Footer>
                     <CreateButton onClick = { (e) => createProject(e) } >
                         Create
                     </CreateButton>
+
+                    {/* Error */}
+                    <Typography sx = {{ fontWeight: 600, color: Colours.error }}>
+                        {error ? error : <></>}
+                    </Typography>
 
                     <IconButton>
                         <Trash3 
                             onClick = { () => { setOpenDialog(false); setData({}) }} 
                             size = {20} 
                             color = {Colours.error} 
+                            aria-label = "delete"
                         />
                     </IconButton>
                </Footer>
 
             </Dialog>
+
+            {/* Snackbar to notify the user when project is saved to Drafts */}
+            <Snackbar
+                open = { openSnackbar }
+                autoHideDuration = { 3000 }
+                onClose = { closeSnackbar }
+                slot = {{ transition: <Fade/> }}
+                anchorOrigin = {{ vertical: 'bottom', horizontal: 'right' }}
+                action = {
+                    <IconButton onClick = { closeSnackbar } aria-label = "close">
+                        <X color = "#FFF" aria-label = "close" />
+                    </IconButton>
+                }
+                message = "Project saved to Drafts."
+            />
         </Box>
     )
 }

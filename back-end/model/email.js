@@ -24,8 +24,7 @@ class Emails {
     }
     
     /**
-     * Fetch records from the Emails table according to folder name 
-     * where user_id in the table is that of the current user.
+     * Fetch records from the Emails or Inbox table according to folder name.
      * @param {uuid} id - user_id
      * @param {string} folder - default empty
      * @returns data or error
@@ -223,6 +222,12 @@ class Emails {
         }
     }
 
+    /**
+     * Update folder name of requested emails to the requested value 
+     * @param {*} id - emails
+     * @param {*} folder - Archives or others
+     * @returns data or error
+     */
     static async archiveEmails (id, folder) {
         const { data, error } = await supabase
        .from("Inbox")

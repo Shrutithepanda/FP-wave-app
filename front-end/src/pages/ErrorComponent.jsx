@@ -10,11 +10,13 @@ const ErrorComponent = () => {
     console.log(error)
 
     return (
-        <Box style = {{marginLeft: 150}} >
-            <Typography>
-                Error loading page.
-            </Typography>
-        </Box>
+        <main>
+            <Box style = {{ marginLeft: 150 }} >
+                <Typography>
+                    Error loading page.
+                </Typography>
+            </Box>
+        </main>
     )
 }
 

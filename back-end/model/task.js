@@ -50,7 +50,7 @@ class Tasks {
     /**
      * Update folder name of a project.
      * @param {id} id - project id
-     * @param {string} folder - trash
+     * @param {string} folder - requested value
      * @returns data or error
      */
     static async updateFolderName (id, folder) {
@@ -109,7 +109,7 @@ class Tasks {
 
     /**
      * Insert a task in the Tasks table.
-     * @param {object} task - task name, status, due data
+     * @param {object} task - task name, status, due date
      * @returns data or error
      */
     static async insertTask (task) {
@@ -192,7 +192,7 @@ class Tasks {
     } 
 
     /**
-     * Delete project(s) from the Projects table where id of the given projects match.
+     * Delete project(s) from the Projects table where id of the requested projects match.
      * @param {int} id - project id
      */
     static async deleteProjects (id) {
@@ -234,10 +234,9 @@ class Tasks {
     } 
 
     /**
-     * 
-     * @param {*} id 
-     * @param {*} folder 
-     * @returns 
+     * Fetch projects from the Projects table where priority is false.
+     * @param {*} id - projects
+     * @returns data or error
      */
     static async fetchUnimportantProjects (id) {
        const { data, error } = await supabase
@@ -257,9 +256,9 @@ class Tasks {
     }
 
     /**
-     * 
-     * @param {*} id 
-     * @returns 
+     * Fetch projects from the Projects table where priority is false and folder is Archives.
+     * @param {*} id - project
+     * @returns data or error
      */
     static async fetchUnimportantProjectsFromArchives (id) {
        const { data, error } = await supabase

@@ -32,7 +32,7 @@ import {
     detectEmotions
 } from "../controller/emotion_controller.js"
 
-// Initialise the router
+// Initialise the express router
 const routes = express.Router()
 
 // Routes for Emails

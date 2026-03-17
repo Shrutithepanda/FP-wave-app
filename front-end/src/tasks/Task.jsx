@@ -1,4 +1,4 @@
-import { Box, IconButton, styled, Typography } from "@mui/material"
+import { Box, IconButton, styled, Tooltip, Typography } from "@mui/material"
 import { CircleFill, Pencil, XLg } from "react-bootstrap-icons"
 import { useEffect } from "react"
 import { useState } from "react"
@@ -8,6 +8,7 @@ import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
 import UpdateTask from "../customComponents/UpdateTask"
 
+// Styled MUI component
 const Wrapper = styled(Box) ({
     display: "flex",
     alignItems: "center",
@@ -63,7 +64,6 @@ const Texts = styled(Box) ({
 const Task  = ({ task, projectId }) => {
     const [indicatorColor, setIndicatorColor] = useState(Colours.notStartedBg)
     const [circleColor, setCircleColor] = useState(Colours.notStartedCircle)
-    const [loading, setLoading] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
     const update = () => setOpenDialog(true)
     
@@ -104,11 +104,13 @@ const Task  = ({ task, projectId }) => {
     return (
         <Wrapper>
             {/* Edit button */}
-            <IconButton onClick = { update }>
-                <Pencil size = {15} color = "#000" />
-            </IconButton>
+            <Tooltip title = "Update">
+                <IconButton onClick = { update }>
+                    <Pencil size = {15} color = "#000" aria-label = "update" />
+                </IconButton>
+            </Tooltip>
 
-            {/* Task name, due data and indicator */}
+            {/* Task name, due date and indicator */}
             <Texts>
                 <Typography>{task.task_name}</Typography>
 
@@ -124,11 +126,13 @@ const Task  = ({ task, projectId }) => {
             </Texts>
 
             {/* Delete task button */}
-            <IconButton onClick = { deleteTask }>
-                <XLg size = {15} color = "#000" />
-            </IconButton>
+            <Tooltip title = "Delete">
+                <IconButton onClick = { deleteTask }>
+                    <XLg size = {15} color = "#000" aria-label = "delete" />
+                </IconButton>
+            </Tooltip>
 
-            {/* Update task model */}
+            {/* Update task dialog */}
             <UpdateTask 
                 openDialog = { openDialog } 
                 setOpenDialog = { setOpenDialog } 

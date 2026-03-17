@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, Card, Link, styled, Typography } from '@mui/material'
 import { Colours } from '../constants/colours'
 
+// Styled MUI components
 const MainContainer = styled(Box) ({
   display: "flex", 
   flexGrow: 1, 
@@ -45,14 +46,16 @@ const HomePage = () => {
   return (
     <MainContainer>
       <StyledContainer> 
-        <ContentContainer>
-          <Typography variant = "h4">Wave</Typography>
-          <Typography variant = "subtitle1">Emotion-aware Email and Task Manager</Typography>
+        <main>
+          <ContentContainer>
+            <Typography variant = "h1" sx = {{ fontSize: 35, fontWeight: 500 }}>Wave</Typography>
+            <Typography variant = "subtitle1">Emotion-aware Email and Task Manager</Typography>
 
-          <Link href = "/login" variant = "button">Login</Link>
-          <Link href = "/register" variant = "button">Register</Link>
-          <Link href = "/emails/inbox" variant = "button" style = {{ background: "none", color: "#000", border: `1px solid ${Colours.primary}` }}>Emails</Link>
-        </ContentContainer>
+            <Link href = "/login" variant = "button">Login</Link>
+            <Link href = "/register" variant = "button">Register</Link>
+            <Link href = "/emails/inbox" variant = "button" style = {{ background: "none", color: "#000", border: `1px solid ${Colours.primary}` }}>Emails</Link>
+          </ContentContainer>
+        </main>
       </StyledContainer>
 
     </MainContainer>

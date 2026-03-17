@@ -34,6 +34,7 @@ const routes = {
             <ViewEmail />
         </ProtectedRoutes>
     },
+    
     // Tasks tab
     tasks_tab: {
         path: "/tasks",
@@ -56,6 +57,7 @@ const routes = {
             <ViewProject />
         </ProtectedRoutes>
     },
+
     // Invalid URL
     invalid: {
         path: "/*",

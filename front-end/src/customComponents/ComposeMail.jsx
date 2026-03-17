@@ -1,12 +1,13 @@
 import { useState } from "react"
-import { Box, Button, Dialog, IconButton, InputBase, styled, TextField, Typography } from "@mui/material"
-import { Trash3, XLg } from "react-bootstrap-icons"
+import { Box, Button, Dialog, Fade, IconButton, InputBase, Snackbar, styled, TextField, Typography } from "@mui/material"
+import { Trash3, X, XLg } from "react-bootstrap-icons"
 
-import { useAuth } from "../hooks/AuthProvider"
 import useApi from "../hooks/useApi"
+import { useAuth } from "../hooks/AuthProvider"
 import { EMAIL_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const dialogStyle = {
     display: "flex",
     flexGrow: 1,
@@ -63,11 +64,18 @@ const Footer = styled(Box) ({
 const ComposeMail = ({ openDialog, setOpenDialog }) => {
     const [data, setData] = useState({})
     const [error, setError] = useState("")
+    const [openSnackbar, setOpenSnackbar] = useState(false)
+
     const { user } = useAuth()
 
     // Initialise email services for sending and saving draft using the custom hook middleware - useApi
     const sentEmailService = useApi(EMAIL_API_URLS.saveSentEmail)
     const saveDraftService = useApi(EMAIL_API_URLS.saveDraft)
+
+    /**
+     * Close snackbar
+     */
+    const closeSnackbar = () => setOpenSnackbar(false)
 
     /**
      * Save the email in the drafts folder if there is content and the close button is clicked
@@ -86,17 +94,27 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
             folder: "drafts"
         }
 
-        // Call the API and pass the body as a parameter
-        saveDraftService.call(body)
-        
-        // If no error is returned, close the dialog box and set data to an empty object
-        if (!saveDraftService?.error) {
+        // If no data is present, close the dialog
+        if (data?.to == undefined || data?.subject == undefined || data?.body == undefined) {
             setOpenDialog(false)
-            setData({})
+            setError("")
         }
-        else {
-            // In case of error keep the dialog open
-            setOpenDialog(true)
+        else if (data?.to && data?.subject && data?.body) { // If data is present save to draft and notify the user
+            // Call the API and pass the body as a parameter
+            saveDraftService.call(body)
+            
+            // If no error is returned, close the dialog box, notify the user and set data to an empty object
+            if (!saveDraftService?.error) {
+                setOpenDialog(false)
+                setOpenSnackbar(true)
+                setData({})
+                setError("")
+            }
+            else {
+                // In case of error keep the dialog open and show the error
+                setOpenDialog(true)
+                setError(saveDraftService?.error)
+            }
         }
     }
 
@@ -105,6 +123,8 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
      */
     const closeOnClickAway = () => {
         setOpenDialog(false)
+        setData({})
+        setError("")
     }
 
     /**
@@ -124,18 +144,26 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
             folder: "sent"
         }
 
-        // Call the API and pass the body as a parameter
-        sentEmailService.call(body)
-        
-        // If no error is returned, close the dialog box, set data to an empty object and reload
-        if (!sentEmailService?.error) {
-            setOpenDialog(false)
-            setData({})
-            window.location.reload()
-        }
-        else {
-            // In case of error keep the dialog open
+        // If empty data is being sent, display error
+        if (data?.to == undefined || data?.subject == undefined || data?.body == undefined) {
             setOpenDialog(true)
+            setError("All fields must be filled")
+        }
+        else if (data?.to && data?.subject && data?.body) { // If there is data in all fields ...
+            // Call the API and pass the body as a parameter
+            sentEmailService.call(body)
+        
+            // If no error is returned, close the dialog box, set data to an empty object and reload
+            if (!sentEmailService?.error) {
+                setOpenDialog(false)
+                setData({})
+                window.location.reload()
+            }
+            else {
+                // In case of error keep the dialog open and show the error
+                setOpenDialog(true)
+                setError(sentEmailService?.error)
+            }
         }
     }
 
@@ -158,11 +186,11 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
                 onClose = { closeOnClickAway }
                 PaperProps = {{ sx: dialogStyle }}
             >
-                {/* Header containing container header and close button */}
+                {/* Header containing title and close button */}
                <Header>
                     <Typography>New message</Typography>
-                    <IconButton onClick = { (e) => closeComposeMail(e)} >
-                        <XLg size = {15} />
+                    <IconButton onClick = { (e) => closeComposeMail(e) } >
+                        <XLg size = {15} aria-label = "close compose dialog" />
                     </IconButton>
                </Header>
 
@@ -170,11 +198,13 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
                <RecipientsWrapper>
                     <InputBase 
                         placeholder = "Send to" 
+                        aria-placeholder = "Send to"
                         name = "to" 
                         onChange = { (e) => onValueChange(e) } 
                     />
                     <InputBase 
                         placeholder = "Subject" 
+                        aria-placeholder = "Subject"
                         name = "subject" 
                         onChange = { (e) => onValueChange(e) } 
                     />
@@ -182,27 +212,46 @@ const ComposeMail = ({ openDialog, setOpenDialog }) => {
 
                 {/* Text field for the body of the email */}
                <TextField 
+                    name = "body"
+                    aria-placeholder = "Body"
                     multiline 
                     rows = {10}  
                     sx = {{ '& .MuiOutlinedInput-notchedOutline': { border: "none" }, paddingLeft: "15px" }}
-                    name = "body"
                     onChange = { (e) => onValueChange(e) }
                 />
 
-                {/* Footer containing send and delete buttons */}
+                {/* Footer containing error and send and delete buttons */}
                <Footer>
                     <SendButton onClick = { (e) => SendMail(e) } >
                         Send
                     </SendButton>
 
-                    {error ? error : <></>}
+                    {/* Error */}
+                    <Typography sx = {{ fontWeight: 600, color: Colours.error }}>
+                        {error ? error : <></>}
+                    </Typography>
 
                     <IconButton onClick = { () => { setOpenDialog(false); setData({}) } }>
-                        <Trash3 size = {20} color = {Colours.error} />
+                        <Trash3 size = {20} color = {Colours.error} aria-label = "delete" />
                     </IconButton>
                </Footer>
                
             </Dialog>
+
+            {/* Snackbar to notify the user when email is saved to Drafts */}
+            <Snackbar
+                open = { openSnackbar }
+                autoHideDuration = { 3000 }
+                onClose = { closeSnackbar }
+                slot = {{ transition: <Fade/> }}
+                anchorOrigin = {{ vertical: 'bottom', horizontal: 'right' }}
+                action = {
+                    <IconButton onClick = { closeSnackbar } aria-label = "close">
+                        <X color = "#FFF" aria-label = "close" />
+                    </IconButton>
+                }
+                message = "Email saved to Drafts."
+            />
         </Box>
     )
 }

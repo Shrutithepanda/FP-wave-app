@@ -5,6 +5,7 @@ import Loader from '../customComponents/Loader'
 import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
 import { Colours } from '../constants/colours'
 
+// Styled MUI components
 const StyledCard = styled(Card) ({
   padding: "20px 60px",   
   backgroundColor: "#F4F4FF",
@@ -34,6 +35,7 @@ const LoginPage = () => {
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
 
+  // Login function from useAuth hook
   const { login } = useAuth()
 
   /**
@@ -54,7 +56,7 @@ const LoginPage = () => {
         // Wait for the login function to log the user in
         const result = await login(email, password)
 
-        // If success response is not returned display the erorr message
+        // If success response is not returned display the error message
         if (!result.success) setMessage(result.error)
 
         // If success response is returned, navigate to the emails page
@@ -74,7 +76,8 @@ const LoginPage = () => {
   }
 
   // If loading display the loader otherwise the content
-  return (loading 
+  return (
+    loading 
     ? (
       <Box>
         <Loader />
@@ -82,55 +85,59 @@ const LoginPage = () => {
     )
     : (
       <Box sx = {{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
-        <StyledCard>
-          {/* Heading and link to Home page */}
-          <Typography variant = "h4">Login</Typography>
-          <Link href = "/" sx = {{ alignSelf: "flex-start" }}>Home</Link>
+        <main>
+          <StyledCard>
+            {/* Heading and link to Home page */}
+            <Typography variant = "h1" sx = {{ fontSize: 35, fontWeight: 500 }}>Login</Typography>
+            <Link href = "/" sx = {{ alignSelf: "flex-start" }}>Home</Link>
 
-          {/* If there is a message, display it */}
-          {message && <Typography color = "error">{message}</Typography>}
+            {/* If there is a message, display it */}
+            {message && <Typography color = "error" sx = {{ fontWeight: 600 }}>{message}</Typography>}
 
-          {/* Email and password fields */}
-          <FormContainer>
-            <TextField 
-              required
-              label = "Emails address" 
-              variant = "outlined" 
-              size = "small"
-              fullWidth
-              value = { email }
-              onChange = { (e) => setEmail(e.target.value) }
-            />
+            {/* Email and password fields */}
+            <FormContainer>
+              <TextField 
+                required
+                label = "Emails address" 
+                aria-label = "email address"
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                value = { email }
+                onChange = { (e) => setEmail(e.target.value) }
+              />
 
-            <TextField 
-              required
-              label = "Password" 
-              type = "password"
-              variant = "outlined" 
-              size = "small"
-              fullWidth
-              value = { password }
-              onChange = { (e) => setPassword(e.target.value) }
-            />
-          </FormContainer>
+              <TextField 
+                required
+                label = "Password" 
+                aria-label = "password"
+                type = "password"
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                value = { password }
+                onChange = { (e) => setPassword(e.target.value) }
+              />
+            </FormContainer>
+            
+            {/* Submit button */}
+            <Button 
+              onClick = { handleSubmit } 
+              variant = "contained" 
+              disabled = { loading } 
+              data-testid = "login-btn"
+            >
+              Login
+            </Button>
           
-          {/* Submit button */}
-          <Button 
-            onClick = { handleSubmit } 
-            variant = "contained" 
-            disabled = { loading } 
-            data-testid = "login-btn"
-          >
-            Login
-          </Button>
-        
-          {/* Link to the Resigter page */}
-          <Typography>
-            Don't have an account yet? &nbsp;
-            <Link href = "/register">Register</Link>
-          </Typography>
+            {/* Link to the Resigter page */}
+            <Typography>
+              Don't have an account yet? &nbsp;
+              <Link href = "/register">Register</Link>
+            </Typography>
 
-        </StyledCard>
+          </StyledCard>
+        </main>
       </Box>
     )
   )

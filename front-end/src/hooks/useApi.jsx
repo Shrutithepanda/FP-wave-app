@@ -32,7 +32,6 @@ const useApi = (urlObject) => {
 
             // Set response to the API's response
             setResponse(res?.data)
-            // if(type == "important") 
             // console.log("useApi response: ", type, res?.data)
 
             // Return the response data

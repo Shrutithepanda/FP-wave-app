@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
-import { Box, IconButton, List, styled, Typography } from "@mui/material"
-import { ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, CircleFill, Pencil, PlusCircle, Trash3 } from "react-bootstrap-icons"
+import React, { Fragment, useEffect, useState } from "react"
+import { Box, Button, Fade, IconButton, List, Snackbar, styled, Tooltip, Typography } from "@mui/material"
+import { ArrowClockwise, ArrowLeft, Bookmark, BookmarkFill, CircleFill, Pencil, PlusCircle, Trash3, X } from "react-bootstrap-icons"
 import { useLocation, useOutletContext } from "react-router-dom"
 
 import Task from "./Task"
@@ -13,7 +13,9 @@ import { useEmotion } from "../hooks/EmotionProvider"
 
 import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
+import ExerciseModal from "../customComponents/ExerciseModal"
 
+// Styled MUI components
 const IconWrapper = styled(Box) ({
     padding: 20,
     display: "flex",
@@ -49,14 +51,14 @@ const Container = styled(Box) ({
         display: "flex",
         "& > p > span": {
             fontSize: 15,
-            color: "#5E5E5E"
+            color: "#4F4E4E"
         }
     }
 })
 
 const Date = styled(Box) ({
     margin: "0 50px 0 auto",
-    color: "#5E5E5E"
+    color: "#4F4E4E"
 })
 
 /**
@@ -70,10 +72,13 @@ const ViewProject = () => {
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false)
     const [loading, setLoading] = useState(false)
     const { openSidebar } = useOutletContext()
+    const [openSnackbarHigh, setOpenSnackbarHigh] = useState(false)
+    const [openExercise, setOpenExercise] = useState(false)
     
     // User object and stressed state
     const { user } = useAuth()
-    const { stressed, stressLevel } = useEmotion()
+    const { stressLevel } = useEmotion()
+
     
     // Extract the project from the router's state
     const { state } = useLocation()
@@ -84,43 +89,6 @@ const ViewProject = () => {
     const toggleHighPriorityService = useApi(TASK_API_URLS.toggleHighPriorityProjects)
     const getTasksService = useApi(TASK_API_URLS.fetchTasks)
 
-    /**
-     * 
-     * @returns a dialog to create a new task
-     */
-    const createNewTask = () => setOpenCreateDialog(true)
-
-    /**
-     * 
-     * @returns a dialog to update a task
-     */
-    const updateProject = () => setOpenUpdateDialog(true)
-
-    /**
-     * Move a project to trash
-     */
-    const deleteProject = () => {
-        // Move the project to trash and reload
-        moveProjectToTrashService.call([project.id])
-        window.history.back()
-    }
-
-    /**
-     * Mark the project as important or un-important
-     */
-    const toggleHighPriorityProjects = () => {
-        toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
-        // setRefresh(prevState => !prevState)
-        window.location.reload()
-    }
-
-    /**
-     * Refresh page
-     */
-    const handleRefresh = () => {
-        window.location.reload()
-    }
-    
     useEffect(() => {
         /**
          * Fetch all tasks for the project
@@ -153,6 +121,62 @@ const ViewProject = () => {
         changeIndicatorColor()
     }, [])
 
+    useEffect(() => {
+        if (stressLevel === "high") setOpenSnackbarHigh(true)
+    }, [stressLevel])
+    
+    /**
+     * Close the snackbar when X is pressed
+     */
+    const closeSnackbar = () => {
+        setOpenSnackbarHigh(false)
+    }
+
+    /**
+     * 
+     * @returns a dialog to create a new task
+     */
+    const createNewTask = () => setOpenCreateDialog(true)
+
+    /**
+     * 
+     * @returns a dialog to update a task
+     */
+    const updateProject = () => setOpenUpdateDialog(true)
+
+    /**
+     * Move a project to trash
+     */
+    const deleteProject = () => {
+        // Move the project to trash 
+        moveProjectToTrashService.call([project.id])
+        window.history.back()
+    }
+
+    /**
+     * Mark the project as important or un-important
+     */
+    const toggleHighPriorityProjects = () => {
+        toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
+        // setRefresh(prev => !prev) // not passed like other props
+        window.location.reload()
+    }
+
+    /**
+     * Refresh page
+     */
+    const handleRefresh = () => {
+        window.location.reload()
+    }
+
+    /**
+     * Open breathing exercise dialog and close the snackbar
+     */
+    const openBreathingExercise = () => {
+        setOpenExercise(true)
+        setOpenSnackbarHigh(false)
+    }
+
     return (
         <Box style = {
                 openSidebar 
@@ -160,6 +184,8 @@ const ViewProject = () => {
                     marginLeft: 158, 
                     marginRight: 30,
                     width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
+                    // Adaptive shadow colour according to different stress levels
+                    height: "calc(100vh - 70px)", // -70px for header's height,
                     boxShadow: `0px 0px 10px 2px ${
                         stressLevel === "low" 
                         ? Colours.lowStressShadow 
@@ -169,7 +195,6 @@ const ViewProject = () => {
                         ? Colours.highStressShadow
                         : Colours.normalShadow
                     }`, 
-                    height: "calc(100vh - 70px)", // -70px for header's height,
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
                     background: Colours.container
@@ -178,6 +203,8 @@ const ViewProject = () => {
                     marginLeft: 30, 
                     marginRight: 30,
                     width: "calc(100% - 60px)",
+                    // Adaptive shadow colour according to different stress levels
+                    height: "calc(100vh - 70px)",
                     boxShadow: `0px 0px 10px 2px ${
                         stressLevel === "low" 
                         ? Colours.lowStressShadow 
@@ -187,7 +214,6 @@ const ViewProject = () => {
                         ? Colours.highStressShadow
                         : Colours.normalShadow
                     }`, 
-                    height: "calc(100vh - 70px)",
                     borderTopLeftRadius: 25,
                     borderTopRightRadius: 25,
                     background: Colours.container
@@ -196,80 +222,125 @@ const ViewProject = () => {
         >
             {/* Back and refresh buttons */}
             <IconWrapper>
-                <IconButton onClick = {() => window.history.back()}>
-                    <ArrowLeft size = {20} aria-label = "back" />
-                </IconButton>
-                    
-                <span style = {{marginLeft: "auto", marginRight: 15}}>
-                    <IconButton onClick = {handleRefresh}>
-                        <ArrowClockwise size = {20} color = "#000" aria-label = "reload" />
+                <Tooltip title = "Back">
+                    <IconButton onClick = { () => window.history.back() }>
+                        <ArrowLeft size = {20} aria-label = "back" />
                     </IconButton>
-                </span>
+                </Tooltip>
+                    
+                <Tooltip title = "Refresh">
+                    <span style = {{ marginLeft: "auto", marginRight: 15 }}>
+                        <IconButton onClick = { handleRefresh }>
+                            <ArrowClockwise size = {20} color = "#000" aria-label = "refresh" />
+                        </IconButton>
+                    </span>
+                </Tooltip>
             </IconWrapper>
 
-            {/* Project title, indicator, bookmark button, edit project button, and delete project button */}
-            <Subject>
-                {project.title}
-                
-                    <Indicator sx = {{ backgroundColor: indicatorColor }}>
-                        <CircleFill size = {10} color = { circleColor } style = {{ marginRight: 5 }} />
-                        {project.status}
-                    </Indicator>
-                
-                { project.priority === true
-                    ? <IconButton onClick = { toggleHighPriorityProjects } style = {{ margin: "0 10px" }}>
-                        <BookmarkFill size = {20} color = {Colours.bookmark} />
-                    </IconButton>
-                    : <IconButton onClick = { toggleHighPriorityProjects } style = {{ margin: "0 10px" }}>
-                        <Bookmark size = {20} />
-                    </IconButton>
-                }
+            <main>
+                {/* Project title, indicator, bookmark button, edit project button, and delete project button */}
+                <Subject>
+                    {project.title}
+                    
+                        <Indicator sx = {{ backgroundColor: indicatorColor }}>
+                            <CircleFill size = {10} color = { circleColor } style = {{ marginRight: 5 }} />
+                            {project.status}
+                        </Indicator>
+                    
+                    { project.priority === true
+                        ? <IconButton onClick = { toggleHighPriorityProjects } style = {{ margin: "0 10px" }}>
+                            <BookmarkFill size = {20} color = {Colours.bookmark} aria-label = "bookmark" />
+                        </IconButton>
+                        : <IconButton onClick = { toggleHighPriorityProjects } style = {{ margin: "0 10px" }}>
+                            <Bookmark size = {20} aria-label = "bookmark" />
+                        </IconButton>
+                    }
 
-                <IconButton onClick = { updateProject }>
-                    <Pencil size = {20}/>
-                </IconButton>
+                    <Tooltip title = "Update">
+                        <IconButton onClick = { updateProject }>
+                            <Pencil size = {20} aria-label = "update" />
+                        </IconButton>
+                    </Tooltip>
 
-                <span style = {{ marginLeft: "auto", marginRight: 40 }}>
-                    <IconButton onClick = { deleteProject }>
-                        <Trash3 size = {20} color = { Colours.error }/>
-                    </IconButton>
-                </span>
-            </Subject>
+                    <Tooltip title = "Delete">
+                        <span style = {{ marginLeft: "auto", marginRight: 40 }}>
+                            <IconButton onClick = { deleteProject }>
+                                <Trash3 size = {20} color = { Colours.error } aria-label = "delete" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Subject>
 
-            {/* Project description, due date */}
-            <Box style = {{ display: "flex" }} >
-                <Container>
-                    <Box style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                        <Typography style = {{ marginTop: 10, marginLeft: 0 }} >
-                            {project.description}
-                        </Typography>
-                        <Date>
-                            Due:&nbsp;
-                            { (new window.Date(project.due_date)).getDate() }&nbsp;
-                            { (new window.Date(project.due_date)).toLocaleDateString("default", { month: "short" }) }&nbsp;
-                            { (new window.Date(project.due_date)).getFullYear() },&nbsp;
-                            { (new window.Date(project.due_date)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
-                        </Date>
-                    </Box>
-                </Container>
-            </Box>
+                {/* Project description, due date */}
+                <Box style = {{ display: "flex" }} >
+                    <Container>
+                        <Box style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                            <Typography style = {{ marginTop: 10, marginLeft: 0 }} >
+                                {project.description}
+                            </Typography>
 
-            {/* Tasks and create new task button */}
-            <Box sx = {{ marginLeft: 4, display: "flex", flexDirection: "column" }}>
-                <List>
-                    { getTasksService?.response?.map((task, index) => (
-                        <Task 
-                            key = { index } 
-                            task = { task } 
-                            projectId = { project.id }
-                        />
-                    ))}
-                </List>
+                            <Date>
+                                Due:&nbsp;
+                                { (new window.Date(project.due_date)).getDate() }&nbsp;
+                                { (new window.Date(project.due_date)).toLocaleDateString("default", { month: "short" }) }&nbsp;
+                                { (new window.Date(project.due_date)).getFullYear() },&nbsp;
+                                { (new window.Date(project.due_date)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
+                            </Date>
+                        </Box>
+                    </Container>
+                </Box>
 
-                <IconButton onClick = { createNewTask } sx = {{ alignSelf: "center", marginTop: 1 }}>
-                    <PlusCircle size = {25} color = "#79747E" />
-                </IconButton>
-            </Box>
+                {/* Tasks and create new task button */}
+                <Box sx = {{ marginLeft: 4, display: "flex", flexDirection: "column" }}>
+                    <List>
+                        { getTasksService?.response?.map((task, index) => (
+                            <Task 
+                                key = { index } 
+                                task = { task } 
+                                projectId = { project.id }
+                            />
+                        ))}
+                    </List>
+
+                    <Tooltip title = "Create task">
+                        <IconButton onClick = { createNewTask } sx = {{ alignSelf: "center", marginTop: 1 }}>
+                            <PlusCircle size = {25} color = "#79747E" aria-label = "create" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            </main>
+
+            {/* Snackbar to show when high stress levels are detected */}
+            { stressLevel === "high"
+                ? <Snackbar
+                    open = { openSnackbarHigh }
+                    autoHideDuration = { 7000 }
+                    onClose = { closeSnackbar }
+                    slot = {{ transition: <Fade/> }}
+                    anchorOrigin = {{ vertical: "bottom", horizontal: "right" }}
+                    action = {
+                        <Fragment>
+                            <Button 
+                                sx = {{ textTransform: "none", fontSize: 14, color: Colours.selectedType }}
+                                onClick = { openBreathingExercise }
+                            >
+                                Try a breathing exercise
+                            </Button>
+                            <IconButton onClick = { closeSnackbar } aria-label = "close">
+                                <X color = "#FFF" aria-label = "close" />
+                            </IconButton>
+                        </Fragment>
+                    }
+                    message = "High stress levels detected! Take a short break or"
+                />
+            : <></>
+            }
+
+            {/* Breathing exercise dialog */}
+            <ExerciseModal
+                openExercise = { openExercise }
+                setOpenExercise = { setOpenExercise }
+            />
 
             {/* Dialogs for creating and updating a task */}
             <ComposeTask 

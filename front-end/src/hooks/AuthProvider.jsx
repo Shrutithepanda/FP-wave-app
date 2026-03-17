@@ -1,6 +1,5 @@
 import React, { useContext, createContext, useState, useEffect } from 'react'
 import supabase from '../supabase/supabaseClient'
-import Loader from '../customComponents/Loader'
 
 // Create auth context
 const AuthContext = createContext({ user: null })
@@ -83,6 +82,7 @@ const AuthProvider = ({ children }) => {
         }
         getUser()
 
+        // Get user's session and set the session to the session received
         supabase.auth.getSession()
         .then(
             ( {data: { session }} ) => {
@@ -107,11 +107,10 @@ const AuthProvider = ({ children }) => {
     }, [])
 
     return (
-        // Return Auth context provider
+        // Return Auth context provider with values
         <AuthContext.Provider
             value = {{ user, authenticated, session, login, logout, register }}
         >
-            {/* { loading === false ? children : <Loader/> } */}
             {children}
         </AuthContext.Provider>
     )

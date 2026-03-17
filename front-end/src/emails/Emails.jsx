@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { useOutletContext, useParams } from 'react-router-dom'
 import { ArrowClockwise, Trash3, X } from 'react-bootstrap-icons'
-import { Box, Button, Checkbox, Fade, IconButton, List, Snackbar } from '@mui/material'
+import { Box, Button, Checkbox, Fade, IconButton, List, Snackbar, Tooltip } from '@mui/material'
 
 import Email from './Email'
 import NoContent from '../customComponents/NoContent'
@@ -14,7 +14,6 @@ import Loader from '../customComponents/Loader'
 import { EMAIL_API_URLS } from '../services/api.urls'
 import { EMPTY_TABS } from '../constants/empty_tabs'
 import { Colours } from '../constants/colours'
-import ConfirmationModal from '../customComponents/ConfirmationModal'
 import ExerciseModal from '../customComponents/ExerciseModal'
 
 const Emails = () => {
@@ -25,11 +24,8 @@ const Emails = () => {
     const [moved, setMoved] = useState(false)
 
     const [openSnackbarMed, setOpenSnackbarMed] = useState(false)
-    const [openSnackbarHigh, setOpenSnackbarHigh] = useState(true)
-    
+    const [openSnackbarHigh, setOpenSnackbarHigh] = useState(false)
     const [openExercise, setOpenExercise] = useState(false)
-    const [openConfirmation, setOpenConfirmation] = useState(false)
-    const [confirmDelete, setConfirmDelete] = useState(false)
     
     // Outlet context to open/close sidebar
     const { openSidebar } = useOutletContext(true)
@@ -76,6 +72,7 @@ const Emails = () => {
         fetchUnimportantEmails()
     }, [])
 
+    // If emails are not already moved, retructure them. Open the snackbar for high stress level when detected
     useEffect(() => {
         if (!moved) restructureEmails()
         if (stressLevel === "high") setOpenSnackbarHigh(true)
@@ -116,16 +113,11 @@ const Emails = () => {
             setRefresh((prev) => !prev)
         }
         else {
-            // setOpenConfirmation(true)
-            // if (confirmDelete) {
             // Move emails to trash folder
             moveEmailsToTrashService.call(selectedEmails)
             setSelectedEmails([])
             setRefresh((prev) => !prev)
-                // console.log(confirmDelete)
-            // }
         }
-        // setRefresh(prevState => !prevState)
     }
 
     /**
@@ -142,7 +134,6 @@ const Emails = () => {
         const emails = unimportantEmails?.map(email => email.id)
         await unArchiveEmailsService.call(emails)
         setRefresh((prev) => !prev)
-        
     }
 
     /**
@@ -181,6 +172,7 @@ const Emails = () => {
                         marginRight: 30,
                         width: "calc(100% - 188px)",  // -188 px for sidebar's width + space for shadow
                         height: "calc(100vh - 70px)", // -70px for header's height,
+                        // Adaptive shadow colours for different stress levels
                         boxShadow: `0px 0px 10px 2px ${
                             stressLevel === "low" 
                             ? Colours.lowStressShadow 
@@ -200,6 +192,7 @@ const Emails = () => {
                         marginRight: 30,
                         width: "calc(100% - 60px)", 
                         height: "calc(100vh - 70px)",
+                        // Adaptive shadow colours for different stress levels
                         boxShadow: `0px 0px 10px 2px ${
                             stressLevel === "low" 
                             ? Colours.lowStressShadow 
@@ -218,12 +211,25 @@ const Emails = () => {
             >
                 {/* Checkbox for selecting all emails, delete button and refresh button */}
                 <Box style = {{ padding: "20px 10px 0 10px", display: "flex", alignItems: "center" }} >
-                    <Checkbox size = "small" onChange = { (e) => selectAllEmails(e) }/>
+                    {/* Select all checkbox */}
+                    <Tooltip title = "Select all">
+                        <Checkbox 
+                            size = "small" 
+                            onChange = { (e) => selectAllEmails(e) }
+                            slotProps = {{
+                                input: { "aria-label": "select all checkbox" }
+                            }}
+                        />
+                    </Tooltip>
 
-                    <IconButton size = "small" onClick = { deleteSelectedEmails }>
-                        <Trash3 color = "#000" />
-                    </IconButton>
+                    {/* Delete button */}
+                    <Tooltip title = "Delete">
+                        <IconButton size = "small" onClick = { deleteSelectedEmails }>
+                            <Trash3 color = "#000" aria-label = "delete" />
+                        </IconButton>
+                    </Tooltip>
 
+                    {/* Move back button to show on the Archives page if there are emails there */}
                     { type === "archives" && getEmailsService?.response?.length
                         ? <Button
                             sx = {{ color: "#000", textTransform: "none", fontSize: 15 }}
@@ -234,33 +240,43 @@ const Emails = () => {
                         : <></>
                     }
 
+                    {/* Refresh button */}
                     <span style = {{ marginLeft: "auto", marginRight: 20 }}>
-                        <IconButton size = "small" onClick = { handleRefresh } >
-                            <ArrowClockwise color = "#000" />
-                        </IconButton>
+                        <Tooltip title = "Refresh">
+                            <IconButton size = "small" onClick = { handleRefresh } >
+                                <ArrowClockwise color = "#000" aria-label = "refresh" />
+                            </IconButton>
+                        </Tooltip>
                     </span>
                 </Box>
 
-                {/* If response is being fetched, show the loader otherwise emails */}
-                {loading 
-                    ? <Box sx = {{ margin: "auto auto", flexGrow: 1 }}>
-                        <Loader/> 
-                    </Box>
-                    : <List>
-                        { getEmailsService?.response?.map((email, index) => (
-                            <Email 
-                                key = { index } 
-                                email = { email } 
-                                type = { type }
-                                selectedEmails = { selectedEmails }
-                                setSelectedEmails = { setSelectedEmails }
-                                setRefresh = { setRefresh }
-                            />
-                        ))}
-                    </List>
-                }
+                <main>
+                    {/* If response is being fetched, show the loader otherwise emails */}
+                    {loading 
+                        ? <Box sx = {{ margin: "auto auto", flexGrow: 1 }}>
+                            <Loader/> 
+                        </Box>
+                        : <List>
+                            { getEmailsService?.response?.map((email, index) => (
+                                <Email 
+                                    key = { index } 
+                                    email = { email } 
+                                    type = { type }
+                                    selectedEmails = { selectedEmails }
+                                    setSelectedEmails = { setSelectedEmails }
+                                    setRefresh = { setRefresh }
+                                />
+                            ))}
+                        </List>
+                    }
 
-                {/* Snackbar with message to show when emails are moved to Archives */}
+                    {/* Show message if no content is returned by the service */}
+                    { getEmailsService?.response?.length === 0 && 
+                        <NoContent message = { EMPTY_TABS[type] }/>
+                    }
+                </main>
+                
+                {/* Snackbars to show at medium and high stress levels when adaptations are made */}
                 { stressLevel === "medium"
                     ? <Snackbar
                         open = { openSnackbarMed }
@@ -270,7 +286,7 @@ const Emails = () => {
                         anchorOrigin = {{ vertical: 'bottom', horizontal: 'right' }}
                         action = {
                             <IconButton onClick = { closeSnackbar } aria-label = "close">
-                                <X color = "#FFF" />
+                                <X color = "#FFF" aria-label = "close" />
                             </IconButton>
                         }
                         message = "Un-important emails moved to the Archives folder."
@@ -291,31 +307,20 @@ const Emails = () => {
                                         Try a breathing exercise
                                     </Button>
                                     <IconButton onClick = { closeSnackbar } aria-label = "close">
-                                        <X color = "#FFF" />
+                                        <X color = "#FFF" aria-label = "close" />
                                     </IconButton>
                                 </Fragment>
                             }
-                            message = "High stress levels detected!"
+                            message = "High stress levels detected! Take a short break or"
                         />
                         : <></>
                 }
-                
-                {/* Show message if no content is returned by the service */}
-                { getEmailsService?.response?.length === 0 && 
-                    <NoContent message = { EMPTY_TABS[type] }/>
-                }
             </Box>
 
-            {/* <ConfirmationModal 
-                openConfirmation = {openConfirmation} 
-                setOpenConfirmation = {setOpenConfirmation} 
-                confirm = {confirmDelete} 
-                setConfirm = {setConfirmDelete}
-            /> */}
-
+            {/* Breathing exercise dialog */}
             <ExerciseModal 
-                openExercise = {openExercise}
-                setOpenExercise = {setOpenExercise}
+                openExercise = { openExercise }
+                setOpenExercise = { setOpenExercise }
             />
         </Box>
     )

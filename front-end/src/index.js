@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { BrowserRouter, RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import ReactDOM from 'react-dom/client'
 import reportWebVitals from './reportWebVitals'
@@ -8,7 +8,7 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.js'
 
-import AuthProvider, { useAuth } from './hooks/AuthProvider'
+import AuthProvider from './hooks/AuthProvider'
 import Loader from './customComponents/Loader'
 import EmotionProvider from './hooks/EmotionProvider'
 

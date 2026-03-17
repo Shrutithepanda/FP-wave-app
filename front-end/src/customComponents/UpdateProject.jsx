@@ -10,6 +10,7 @@ import { TASK_API_URLS } from "../services/api.urls"
 import useApi from "../hooks/useApi"
 import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const dialogStyle = {
     display: "flex",
     flexGrow: 1,
@@ -63,7 +64,8 @@ const Footer = styled(Box) ({
  */
 const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
     const [data, setData] = useState(project)
-    const [status, setStatus] = useState("")
+    const [error, setError] = useState("")
+    const [_, setStatus] = useState("")
 
     // Initialise the update project service
     const updateProjectService = useApi(TASK_API_URLS.updateProject)
@@ -76,19 +78,11 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
         e.preventDefault() 
         setOpenDialog(false)
         setData(project)
-    }
-
-    /**
-     * Close when clicked outside of the dialog. Keep the previous data.
-     */
-    const closeOnClickAway = () => {
-        setOpenDialog(false)
-        setData(project)
+        setError("")
     }
 
     /**
      * Update a project in the Projects table with the required fields
-     * @param {*} e 
      */
     const updateProject = (e) => {
         e.preventDefault()
@@ -104,20 +98,28 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
                 due_date: data?.due_date,
                 folder: "completed"
             }
-    
-            // Call the API and pass the body as a parameter
-            updateProjectService.call(body)
-            
-            // If no error is returned, close the dialog box, set data to the updated data and reload
-            if (!updateProjectService?.error) {
-                setOpenDialog(false)
-                setData(data)
-                
-                window.location.reload()
-            }
-            else {
-                // In case of error
+
+            // If empty data is being sent, display error
+            if (data?.title == "" || data?.description == "" || data?.status == undefined || data?.due_date == undefined) {
+                console.log(data)
                 setOpenDialog(true)
+                setError("All fields must be filled")
+            }
+            else if (data?.title && data?.description && data?.status && data?.due_date) { // If there is data in all fields ...
+                // Call the API and pass the body as a parameter
+                updateProjectService.call(body)
+                
+                // If no error is returned, close the dialog box, set data to the updated data and reload
+                if (!updateProjectService?.error) {
+                    setOpenDialog(false)
+                    setData(data)
+                    window.location.reload()
+                }
+                else {
+                    // In case of error keep the dialog open and show the error
+                    setOpenDialog(true)
+                    setError(updateProjectService?.error)
+                }
             }
         }
         else {
@@ -131,26 +133,32 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
                 folder: "projects"
             }
     
-            // Call the API and pass the body as a parameter
-            updateProjectService.call(body)
-            
-            // If no error is returned, close the dialog box, set data to the updated data and reload
-            if (!updateProjectService?.error) {
-                setOpenDialog(false)
-                setData(data)
-                
-                window.location.reload()
-            }
-            else {
-                // In case of error
+            // If empty data is being sent, display error
+            if (data?.title == "" || data?.description == "" || data?.status == undefined || data?.due_date == undefined) {
                 setOpenDialog(true)
+                setError("All fields must be filled")
+            }
+            else if (data?.title && data?.description && data?.status && data?.due_date) { // If there is data in all fields ...
+                // Call the API and pass the body as a parameter
+                updateProjectService.call(body)
+                
+                // If no error is returned, close the dialog box, set data to the updated data and reload
+                if (!updateProjectService?.error) {
+                    setOpenDialog(false)
+                    setData(data)
+                    window.location.reload()
+                }
+                else {
+                    // In case of error keep the dialog open and show the error
+                    setOpenDialog(true)
+                    setError(updateProjectService?.error)
+                }
             }
         }
     }
 
     /**
      * Set the data to the data entered in the input fields
-     * @param {*} e 
     */
     const onValueChange = (e) => {        
         // Store value and name based on the DateTimePicker or TextFields
@@ -167,14 +175,14 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
         <Box>
             <Dialog
                 open = { openDialog }
-                onClose = { closeOnClickAway }
+                onClose = { (e) => closeDialog(e) }
                 PaperProps = {{ sx: dialogStyle }}
             >
                 {/* Header containing dialog title and close button */}
                <Header>
                     <Typography>Update project</Typography>
-                    <IconButton onClick = {(e) => closeDialog(e)}>
-                        <XLg size = {15} color = "#000" />
+                    <IconButton onClick = { (e) => closeDialog(e) }>
+                        <XLg size = {15} color = "#000" aria-label = "close update project dialog" />
                     </IconButton>
                </Header>
 
@@ -184,12 +192,14 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
                     <InputBase 
                         value = { data.title } 
                         name = "title" 
+                        aria-placeholder = "Title"
                         onChange = { (e) => onValueChange(e) } 
                         sx = {{ borderBottom: `1px solid ${Colours.cardBg}` }}
                     />
                     <InputBase 
                         value = { data.description } 
                         name = "description" 
+                        aria-placeholder = "Description"
                         onChange = { (e) => onValueChange(e) } 
                     />
 
@@ -199,13 +209,14 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
                         <Select
                             label = "Status"
                             name = "status"
+                            aria-label = "Status"
                             value = { data.status }
                             onChange = { (e) => onValueChange(e) }
                         >
-                            <MenuItem value = {"Not started"}>Not started</MenuItem>
-                            <MenuItem value = {"In progress"}>In progress</MenuItem>
-                            <MenuItem value = {"Completed"}>Completed</MenuItem>
-                            <MenuItem value = {"Pending"}>Pending</MenuItem>
+                            <MenuItem value = {"Not started"} aria-label = "Not started">Not started</MenuItem>
+                            <MenuItem value = {"In progress"} aria-label = "In progress">In progress</MenuItem>
+                            <MenuItem value = {"Completed"} aria-label = "Completed">Completed</MenuItem>
+                            <MenuItem value = {"Pending"} aria-label = "Pending">Pending</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -222,11 +233,16 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
                     </LocalizationProvider>
                </FieldWrapper>
 
-                {/* Footer containing the update button */}
+                {/* Footer containing the update button and error */}
                <Footer>
                     <SendButton onClick = { (e) => updateProject(e) } >
                         Update
                     </SendButton>
+
+                    {/* Error */}
+                    <Typography sx = {{ fontWeight: 600, color: Colours.error }}>
+                        {error ? error : <></>}
+                    </Typography>
                </Footer>
             </Dialog>
         </Box>

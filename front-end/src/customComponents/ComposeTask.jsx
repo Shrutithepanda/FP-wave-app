@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Box, Button, Dialog, FormControl, IconButton, InputBase, InputLabel, MenuItem, Select, styled, Typography } from "@mui/material"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -10,6 +10,7 @@ import useApi from "../hooks/useApi"
 import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const dialogStyle = {
     display: "flex",
     flexGrow: 1,
@@ -63,31 +64,23 @@ const Footer = styled(Box) ({
  */
 const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
     const [data, setData] = useState({})
+    const [error, setError] = useState("")
     const [status, setStatus] = useState("")
     const { user } = useAuth()
 
     // Initialise create task service 
     const createTaskService = useApi(TASK_API_URLS.createTask)
 
-
     /**
      * Close the dialog and set the fields back to their initial values
      * @param {*} e 
      */
-    const closeComposeMail = (e) => {
+    const closeComposeTask = (e) => {
         e.preventDefault() 
         setOpenDialog(false)
         setData({})
         setStatus("")
-    }
-
-    /**
-     * Close the dialog when clicked outside
-     */
-    const closeOnClickAway = () => {
-        setOpenDialog(false)
-        setData({})
-        setStatus("")
+        setError("")
     }
 
     /**
@@ -107,18 +100,26 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
             folder: "view"
         }
 
-        // Call the API and pass the body as a parameter
-        createTaskService.call(body)
-        
-        // If no error is returned, close the dialog box, set data to an empty object and reload
-        if (!createTaskService?.error) {
-            setOpenDialog(false)
-            setData({})
-            window.location.reload()
-        }
-        else {
-            // In case of error
+        // If empty data is being sent, display error
+        if (data?.task_name == undefined || data?.status == undefined || data?.due_date == undefined) {
             setOpenDialog(true)
+            setError("All fields must be filled")
+        }
+        else if (data?.task_name && data?.status && data?.due_date) { // If data is present in all fields ...
+            // Call the API and pass the body as a parameter
+            createTaskService.call(body)
+            
+            // If no error is returned, close the dialog box, set data to an empty object and reload
+            if (!createTaskService?.error) {
+                setOpenDialog(false)
+                setData({})
+                window.location.reload()
+            }
+            else {
+                // In case of error keep the dialog open and show the error
+                setOpenDialog(true)
+                setError(createTaskService?.error)
+            }
         }
     }
 
@@ -148,14 +149,14 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
         <Box>
             <Dialog
                 open = { openDialog }
-                onClose = { closeOnClickAway }
+                onClose = { (e) => closeComposeTask(e) }
                 PaperProps = {{ sx: dialogStyle }}
             >
                 {/* Header containing dialog heading and close button */}
                <Header>
                     <Typography>New task</Typography>
-                    <IconButton onClick = {(e) => closeComposeMail(e)}>
-                        <XLg size = {15} color = "#000" />
+                    <IconButton onClick = {(e) => closeComposeTask(e)}>
+                        <XLg size = {15} color = "#000" aria-label = "close compose dialog" />
                     </IconButton>
                </Header>
 
@@ -164,6 +165,7 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
                     {/* Task name */}
                     <InputBase 
                         placeholder = "Task name" 
+                        aria-placeholder = "Task name"
                         name = "task_name" 
                         onChange = { (e) => onValueChange(e) } 
                     />
@@ -174,13 +176,14 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
                         <Select
                             label = "Status"
                             name = "status"
+                            aria-label = "Status"
                             value = { status }
                             onChange = { (e) => onValueChange(e) }
                         >
-                            <MenuItem value = {"Not started"}>Not started</MenuItem>
-                            <MenuItem value = {"In progress"}>In progress</MenuItem>
-                            <MenuItem value = {"Completed"}>Completed</MenuItem>
-                            <MenuItem value = {"Pending"}>Pending</MenuItem>
+                            <MenuItem value = {"Not started"} aria-label = "Not started">Not started</MenuItem>
+                            <MenuItem value = {"In progress"} aria-label = "In progress">In progress</MenuItem>
+                            <MenuItem value = {"Completed"} aria-label = "Completed">Completed</MenuItem>
+                            <MenuItem value = {"Pending"} aria-label = "Pending">Pending</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -196,17 +199,23 @@ const ComposeTask = ({ openDialog, setOpenDialog, projectId }) => {
                     </LocalizationProvider>
                </FieldWrapper>
 
-                {/* Footer containing create and delete button */}
+                {/* Footer containing error, create and delete button */}
                <Footer>
                     <SendButton onClick = { (e) => createTask(e) }>
                         Create
                     </SendButton>
 
+                    {/* Error */}
+                    <Typography sx = {{ fontWeight: 600, color: Colours.error }}>
+                        {error ? error : <></>}
+                    </Typography>
+
                     <IconButton>
                         <Trash3 
-                            onClick = { () => { setOpenDialog(false); setStatus(false) } } 
+                            onClick = { (e) => closeComposeTask(e) } 
                             size = {20} 
                             color = {Colours.error} 
+                            aria-label = "delete"
                         />
                     </IconButton>
                </Footer>

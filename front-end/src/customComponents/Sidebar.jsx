@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
-import { PersonFill, PencilSquare, CircleFill } from 'react-bootstrap-icons'
-import { Drawer, Box, List, ListItem, styled, IconButton, Typography, Button } from '@mui/material'
+import { PersonFill, PencilSquare, CircleFill, Circle } from 'react-bootstrap-icons'
+import { Drawer, Box, List, ListItem, styled, IconButton, Typography, Button, Tooltip } from '@mui/material'
 
 import { EMAIL_SIDERBAR_CONTENT, TASK_SIDERBAR_CONTENT } from './sidebar.config'
 import { routes } from '../constants/routes'
@@ -11,6 +11,7 @@ import ProfileModal from './ProfileModal'
 import ComposeMail from './ComposeMail'
 import ComposeProject from './ComposeProject'
 
+// Styled MUI components
 const Container = styled(Box) ({
     display: "flex",
     flexDirection: "column",
@@ -31,7 +32,7 @@ const Container = styled(Box) ({
     }
 })
 
-const ComposeButton = styled(Box) ({
+const ComposeButton = styled(Button) ({
     background: "#CFA9EF",
     color: "#001D35",
     padding: 15,
@@ -67,7 +68,7 @@ const SideBar = ({ tasks = false, openSidebar }) => {
     const { type } = useParams()
 
     // Get current value of stressed
-    const { camOn, stressed, stressLevel, startCapturing, stopCapturing, setStressed, setStressLevel } = useEmotion()
+    const { camOn, stressed, startCapturing, stopCapturing, setStressed, setStressLevel } = useEmotion()
 
     /**
      * Turn adaptive mode on
@@ -87,7 +88,7 @@ const SideBar = ({ tasks = false, openSidebar }) => {
 
     return (
         tasks 
-            // Sidebar for Tasks page
+            // ------------------------ Sidebar for Tasks page ------------------------ 
             ? <Drawer 
                 anchor = "left" 
                 open = { openSidebar }
@@ -106,13 +107,15 @@ const SideBar = ({ tasks = false, openSidebar }) => {
             >
                 <Container>
                     {/* Profile icon */}
-                    <IconButton onClick = { onProfileClick } sx = {{ marginLeft: 2 }}>
-                        <PersonFill color = "#000" size = {20}  aria-label = "Profile" />
-                    </IconButton>
+                    <Tooltip title = "Profile">
+                        <IconButton onClick = { onProfileClick } sx = {{ marginLeft: 2 }}>
+                            <PersonFill color = "#000" size = {20}  aria-label = "profile" />
+                        </IconButton>
+                    </Tooltip>
 
                     {/* Compose button */}
                     <ComposeButton onClick = { onComposeClick }>
-                        <PencilSquare color = "#000" size = {20}  aria-label = "Compose" style = {{ marginRight: 10 }} />
+                        <PencilSquare color = "#000" size = {20}  aria-label = "compose" style = {{ marginRight: 10 }} />
                         Compose
                     </ComposeButton>
 
@@ -139,39 +142,44 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                         }
                     </List>
                     
-                    {/* Indicator for Calm mode */}
+                    {/* Indicator for Adaptive mode */}
                     <Box sx = {{ marginTop: "calc(100vh - 460px)", alignSelf: "flex-end" }}>
                         <Indicator>
-                            <CircleFill size = {10} color = {camOn ? "#27CF4E" : "#666666"} />
+                            { camOn || stressed
+                                ? <CircleFill size = {10} color = "#27CF4E" />
+                                : <Circle size = {10} color = "#000" />
+                            }
                             Adaptive Mode
                         </Indicator>
-                        { camOn
+
+                        { camOn || stressed
                             ? <Button 
                                 onClick = { turnOff }
-                                sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
+                                sx = {{ textTransform: "none", fontSize: 15, color: "#46146E" }}
+                                aria-description = "Turn off adaptive mode"
                             >
                                 Turn off?
                             </Button>
 
                             : <Button 
                                 onClick = { turnOn }
-                                sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
+                                sx = {{ textTransform: "none", fontSize: 15, color: "#46146E" }}
+                                aria-description = "Turn on adaptive mode"
                             >
                                 Turn on?
                             </Button>
                         }
-                        { stressLevel }
                     </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}
-                    <ProfileModal openProfile = {openProfile} setOpenProfile = {setOpenProfile} />
+                    <ProfileModal openProfile = { openProfile } setOpenProfile = { setOpenProfile } />
 
                     {/* Compose project modal - opens when compose button is clicked */}
-                    <ComposeProject openDialog = {openDialog} setOpenDialog = {setOpenDialog} />
+                    <ComposeProject openDialog = { openDialog } setOpenDialog = { setOpenDialog } />
                 </Container>
             </Drawer>
 
-            // Sidebar for Emails page
+            // ------------------------ Sidebar for Emails page ------------------------ 
             : <Drawer 
                 anchor = "left" 
                 open = { openSidebar }
@@ -190,13 +198,15 @@ const SideBar = ({ tasks = false, openSidebar }) => {
             >
                 <Container>
                     {/* Profile icon */}
-                    <IconButton onClick = { onProfileClick } sx = {{ marginLeft: 2 }}>
-                        <PersonFill color = "#000" size = {20}  aria-label = "Profile" />
-                    </IconButton>
+                    <Tooltip title = "Profile">
+                        <IconButton onClick = { onProfileClick } sx = {{ marginLeft: 2 }}>
+                            <PersonFill color = "#000" size = {20}  aria-label = "profile" />
+                        </IconButton>
+                    </Tooltip>
 
                     {/* Compose button */}
                     <ComposeButton onClick = { onComposeClick }>
-                        <PencilSquare color = "#000" size = {20}  aria-label = "Compose" style = {{ marginRight: 10 }} />
+                        <PencilSquare color = "#000" size = {20}  aria-label = "compose" style = {{ marginRight: 10 }} />
                         Compose
                     </ComposeButton>
 
@@ -217,41 +227,45 @@ const SideBar = ({ tasks = false, openSidebar }) => {
                                     >
                                         {data.icon}{data.title}
                                     </ListItem>
-                                        
                                 </NavLink>
                             ))
                         }
                     </List>
 
-                    {/* Indicator for Calm mode */}
+                    {/* Indicator for Adaptive mode */}
                     <Box sx = {{ marginTop: "calc(100vh - 460px)", alignSelf: "flex-end" }}>                        
                         <Indicator>
-                            <CircleFill size = {10} color = {camOn ? "#27CF4E" : "#666666"} />
+                            { camOn || stressed
+                                ? <CircleFill size = {10} color = "#27CF4E" />
+                                : <Circle size = {10} color = "#000" />
+                            }
                             Adaptive Mode
                         </Indicator>
-                        { camOn
+
+                        { camOn || stressed
                             ? <Button 
                                 onClick = { turnOff }
-                                sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
+                                sx = {{ textTransform: "none", fontSize: 15, color: "#46146E" }}
+                                aria-description = "Turn off adaptive mode"
                             >
                                 Turn off?
                             </Button>
 
                             : <Button 
                                 onClick = { turnOn }
-                                sx = {{ textTransform: "none", fontSize: 15, color: Colours.primary }}
+                                sx = {{ textTransform: "none", fontSize: 15, color: "#46146E" }}
+                                aria-description = "Turn on adaptive mode"
                             >
                                 Turn on?
                             </Button>
                         }
-                        { stressLevel }
                     </Box>
                     
                     {/* Profile modal - opens when profile icon is clicked */}
-                    <ProfileModal openProfile = {openProfile} setOpenProfile = {setOpenProfile} />
+                    <ProfileModal openProfile = { openProfile } setOpenProfile = { setOpenProfile } />
 
                     {/* Compose mail modal - opens when compose button is clicked */}
-                    <ComposeMail openDialog = {openDialog} setOpenDialog = {setOpenDialog} />
+                    <ComposeMail openDialog = { openDialog } setOpenDialog = { setOpenDialog } />
                 </Container>
             </Drawer>
     )

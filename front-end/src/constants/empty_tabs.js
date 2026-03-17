@@ -1,4 +1,6 @@
-// Messages to show in empty tabs
+/**
+ * Messages to show in empty tabs
+ */ 
 export const EMPTY_TABS = {
     // Emails
     inbox: {
@@ -40,6 +42,6 @@ export const EMPTY_TABS = {
 
     important: {
         heading: "You haven't marked any items important yet.",
-        subHeading: "Save any items important to you by clicking the bookmark icon."
+        subHeading: "Save any items important to you using the bookmark icon."
     },
 }

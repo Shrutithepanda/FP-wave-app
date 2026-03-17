@@ -147,10 +147,10 @@ export const markEmailAsRead = async (req, res) => {
 }
 
 /**
- * 
+ * Get unimportant emails from the Inbox table
  * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} res - message with unimportant emails
+ * @returns a success reponse with unimportant emails or an error response
  */
 export const getUnimportantEmails = async (req, res) => {
     try {
@@ -190,10 +190,10 @@ export const archiveEmails = async (req, res) => {
 }
 
 /**
- * Move the emails from archive to inbox by setting the folder to inbox for the matching records
+ * Move the emails from Archives to Inbox by setting the folder to inbox for the matching records
  * @param {object} req - id of the email(s) and folder name: archive
  * @param {object} res 
- * @returns a success response and emails moved back to inbox or an error response
+ * @returns a success response and emails moved back to Inbox or an error response
  */
 export const unArchiveEmails = async (req, res) => {
     try {

@@ -1,4 +1,6 @@
-// API URLS for Emails tab
+/**
+ *  API URLS for Emails tab
+ */ 
 export const EMAIL_API_URLS = {
     getEmailFromType: {
         endpoint: "emails",
@@ -42,7 +44,9 @@ export const EMAIL_API_URLS = {
     }
 }
 
-// API URLS for Tasks tab
+/**
+ *  API URLS for Tasks tab
+ */ 
 export const TASK_API_URLS = {
     getProjects: {
         endpoint: "tasks",
@@ -102,7 +106,9 @@ export const TASK_API_URLS = {
     }
 }
 
-// API URL for Emotion detection
+/**
+ * API URL for Emotion detection
+ */ 
 export const EMOTION_API_URLS = {
     detectEmotions: {
         endpoint: "detect-emotions",

@@ -1,6 +1,6 @@
 import { Box, Divider, styled, Typography } from "@mui/material"
-import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const Component = styled(Box) ({
     display: "flex",
     flexDirection: "column",
@@ -22,11 +22,14 @@ const StyledDivider = styled(Divider) ({
  */
 const NoContent = ({ message }) => {
     return (
-        <Component>
-            <Typography>{message?.heading}</Typography>
-            <Typography>{message?.subHeading}</Typography>
-            <StyledDivider />
-        </Component>
+        <main>
+            <Component>
+                <Typography>{message?.heading}</Typography>
+                <Typography>{message?.subHeading}</Typography>
+                
+                <StyledDivider />
+            </Component>
+        </main>
     )
 }
 

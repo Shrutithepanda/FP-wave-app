@@ -7,6 +7,7 @@ import Loader from './Loader'
 import { useAuth } from '../hooks/AuthProvider'
 import { Colours } from '../constants/colours'
 
+// Styled MUI components
 const dialogStyle = {
     height: 200,
     width: "50%",
@@ -60,6 +61,9 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
 
     const { user, logout } = useAuth()
 
+    /**
+     * Close the dialog
+     */
     const closeDialog = (e) => {
         e.preventDefault() 
         setOpenProfile(false)
@@ -67,14 +71,14 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
 
     /**
      * 
-     * Handle user log out.
+     * Handle user log out
      */
     const handleLogout = async (e) => {
         e.preventDefault()
         try {
             setLoading(true)
 
-            // Logout and nabigate to Login page
+            // Logout and navigate to Login page
             const error = await logout()
             navigate("/login")
 
@@ -93,13 +97,13 @@ const ProfileModal = ({ openProfile, setOpenProfile }) => {
             <Dialog
                 open = {openProfile}
                 PaperProps = {{ sx: dialogStyle }}
-                onClose = {(e) => closeDialog(e)}
+                onClose = { (e) => closeDialog(e) }
             >
-                {/* Header containing dialog title and clode button */}
+                {/* Header containing dialog title and close button */}
                <Header>
                     <Typography>Profile</Typography>
                     <IconButton onClick = {(e) => closeDialog(e)} >
-                        <XLg size = {15} color = "#000" />
+                        <XLg size = {15} color = "#000" aria-label = "close profile dialog" />
                     </IconButton>
                </Header>
 

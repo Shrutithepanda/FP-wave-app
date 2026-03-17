@@ -1,4 +1,4 @@
-import { Box, Checkbox, IconButton, styled, Typography } from "@mui/material"
+import { Box, Button, Checkbox, IconButton, styled, Tooltip, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import { Bookmark, BookmarkFill, CircleFill } from "react-bootstrap-icons"
 
@@ -7,7 +7,9 @@ import { routes } from "../constants/routes"
 import { Colours } from "../constants/colours"
 import useApi from "../hooks/useApi"
 
+// Styled MUI components
 const Wrapper = styled(Box) ({
+    background: Colours.cardBg,
     display: "flex",
     alignItems: "center",
     padding: "0 0 0 10px",
@@ -42,7 +44,7 @@ const StyledText = styled(Box) ({
  * @param {function} setSelectedEmails 
  * @param {string} type 
  * @param {boolean} setRefresh 
- * @returns a single Email component with details, to show for the Emails tab
+ * @returns a single Email cell with details. Shown on the Emails tab.
  */
 const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) => {
     const navigate = useNavigate()
@@ -56,9 +58,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
      */
     const toggleHighPriorityMails = () => {
         toggleHighPriorityService.call({ id: email.id, priority: !email.priority, type: type })
-        // The page reloads but a full reload is needed for the state change to reflect
-        // setRefresh((prev) => !prev)
-        window.location.reload()
+        setRefresh((prev) => !prev)
     }
 
     /**
@@ -86,37 +86,46 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
     }
 
     return (
-        <Wrapper
-            sx = {{ background: Colours.cardBg }}
-        >
-            {/* Checkbox to mark email important or un-important */}
-            <Checkbox 
-                size = "small" 
-                // checked if the id value exists in the array - selectedEmails
-                checked = { selectedEmails.includes(email.id) } 
-                onChange = { onValueChange }
-            />
+        <Wrapper>
+            {/* Checkbox */}
+            <Tooltip title = "Select">
+                <Checkbox 
+                    size = "small" 
+                    // Checked if the id value exists in the array - selectedEmails
+                    checked = { selectedEmails.includes(email.id) } 
+                    onChange = { onValueChange }
+                    slotProps = {{
+                        input: { "aria-label": "checkbox" }
+                    }}
+                />
+            </Tooltip>
 
             {/* Bookmark icon - filled if email is marked important */}
             {email.priority === true
-                ? <IconButton 
-                    size = "small" 
-                    onClick = { toggleHighPriorityMails } 
-                    sx = {{ marginRight: 1 }}
-                >
-                    <BookmarkFill size = {20} color = { Colours.bookmark } style = {{ flexShrink: 0 }} />
-                </IconButton>
-                : <IconButton 
-                    size = "small" 
-                    onClick = { toggleHighPriorityMails } 
-                    sx = {{ marginRight: 1 }}
-                >
-                    <Bookmark size = {20} style = {{ flexShrink: 0 }} />
-                </IconButton>
+                ? <Tooltip title = "Mark un-important">
+                    <IconButton 
+                        size = "small" 
+                        onClick = { toggleHighPriorityMails } 
+                        sx = {{ marginRight: 1 }}
+                        aria-label = "bookmark"
+                    >
+                        <BookmarkFill size = {20} color = { Colours.bookmark } style = {{ flexShrink: 0 }} />
+                    </IconButton>
+                </Tooltip>
+                : <Tooltip title = "Mark important">
+                    <IconButton 
+                        size = "small" 
+                        onClick = { toggleHighPriorityMails } 
+                        sx = {{ marginRight: 1 }}
+                        aria-label = "bookmark"
+                    >
+                        <Bookmark size = {20} style = {{ flexShrink: 0 }} />
+                    </IconButton>
+                </Tooltip>
             }
 
             {/* Email info. Navigates to ViewEmail page on click. */}
-            <Box 
+            <Button
                 onClick = {
                     // Route to ViewEmail component path
                     () => {
@@ -136,6 +145,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                     flexDirection: "column", 
                     alignItems: "flex-start", 
                     justifyContent: "space-between", 
+                    textTransform: "none",
                     flexGrow: 1, 
                     paddingTop: 1, 
                     paddingBottom: 1
@@ -145,15 +155,11 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                 <Box 
                     sx = {{ width: "100%", minWidth: 0, display: "flex", flexDirection: "row", justifyContent: "space-between" }}
                 >
-                        <Typography 
-                            sx = {{ color: email.read ? "#424242" : "#000" }}
-                        >
+                        <Typography  sx = {{ color: email.read ? "#424242" : "#000" }}>
                             {email.send_to}
                         </Typography>
 
-                        <Box 
-                            style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}
-                        >
+                        <Box style = {{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                             { email.read 
                                 ? <></>
                                 : <CircleFill 
@@ -192,7 +198,7 @@ const Email = ({ email, selectedEmails, setSelectedEmails, type, setRefresh }) =
                             </Typography>                            
                         </Box>
                     </StyledText>
-            </Box>
+            </Button>
         </Wrapper>
     )
 }

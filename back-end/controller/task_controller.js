@@ -39,7 +39,7 @@ export const fetchProjects = async (req, res) => {
  */
 export const moveProjectToTrash = async (req, res) => {
     try {
-        // Update folder name of the requested project to trash
+        // Update folder name of the requested project(s) to trash
         const project = await Tasks.updateFolderName(req.body, "trash")
 
         // Return status code 200 OK and the updated project
@@ -194,7 +194,7 @@ export const updateTask = async (req, res) => {
  */
 export const deleteProjects = async (req, res) => {
     try {
-        // Delete a project
+        // Delete a project(s)
         await Tasks.deleteProjects(req.body)
 
         // Return status code 200 OK
@@ -229,10 +229,10 @@ export const deleteTask = async (req, res) => {
 }
 
 /**
- * 
+ * Get unimportant projects from the Projects folder
  * @param {*} req 
  * @param {*} res 
- * @returns 
+ * @returns a success response with unimportant emails or an error response
  */
 export const getUnimportantProjects = async (req, res) => {
     try {
@@ -274,10 +274,10 @@ export const archiveProjects = async (req, res) => {
 }
 
 /**
- * Move the projects from archives to projects by setting the folder to projects for the matching records
+ * Move the projects from Archives to Projects by setting the folder to projects for the matching records
  * @param {object} req - id of the email(s) and folder name: archive
  * @param {object} res 
- * @returns a success response and projects moved back to inbox or an error response
+ * @returns a success response and projects moved back to Projects or an error response
  */
 export const unArchiveProjects = async (req, res) => {
     try {

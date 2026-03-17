@@ -7,7 +7,7 @@ const EmotionContext = createContext()
 
 /**
  * Create a context provider 
- * @returns capturing functions and stress state
+ * @returns capturing functions, stress state and stress levels
  */
 const EmotionProvider = ({ children }) => {
     let videoRef = useRef(null)
@@ -121,16 +121,17 @@ const EmotionProvider = ({ children }) => {
     }
 
     /**
-     * Infer stress from the emotion data received from the API
+     * Calculate stress from the emotion data received from the API
      */
     const calculateStress = () => {
         const negativeEmotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
+
+        // Primary emotion's type and confidence values
         const type = emotions[0]?.Type
         const confidence = emotions[0]?.Confidence
 
         // If type and confidence are not undefined, set emotions in interval to the current emotion
         if (type && confidence) {
-            // console.log(idRef.current, type, confidence)
             setEmotionsInInterval([{id: idRef.current++, Type: type, Confidence: confidence}, ...emotionsInInterval])
         }
 
@@ -201,21 +202,21 @@ const EmotionProvider = ({ children }) => {
         }
     }, [emotions])
 
-    // Un-comment these lines to see the current emotion and stress levels on the console
-    // useEffect(() => {
-    //     console.log(`${emotions[0]?.Type}`)
-    // }, [emotions])
+    useEffect(() => {
+        // Un-comment this line to see the current emotion and stress levels on the console
+        // console.log(`${emotions[0]?.Type}`)
+    }, [emotions])
 
-    // useEffect(() => {
-    //     console.log(`Len: ${emotionsInInterval.length} \nStress level: \n${stressLevel}`)
-    // }, [emotionsInInterval, stressed])
+    useEffect(() => {
+        // console.log(`Emotion: ${emotions[0]?.Type}, \nLen: ${emotionsInInterval.length} \nStress level: ${stressLevel}`)
+    }, [emotions, emotionsInInterval, stressed])
 
     // ================ Code to detect stress from hard-coded emotions object every 5 seconds ================
     // Current list in the dummy data
     const [currentEmotion, setCurrentEmotion] = useState([])
     // Current index
     const [index, setIndex] = useState(0)
-    // Dummy emotions data object - 9 lists
+    // Dummy emotions data object - 9 arrays
     const dummyEmotionData = [
         [
             { Type: "DISGUSTED", Confidence: 99.34895324707031 },
@@ -332,6 +333,8 @@ const EmotionProvider = ({ children }) => {
          */
         const calculateDummyStress = () => {
             const negativeEmotions = ['SAD', 'DISGUSTED', 'CONFUSED', 'ANGRY', 'FEAR']
+
+            // Primary emotion's type and confidence values
             const type = currentEmotion[0]?.Type
             const confidence = currentEmotion[0]?.Confidence
 
@@ -385,7 +388,7 @@ const EmotionProvider = ({ children }) => {
             }
         }
         
-        // Un-comment out this line to calculate stress on dummy data
+        // Un-comment this line to calculate stress on dummy data
         calculateDummyStress()
     }, [currentEmotion]) // if current emotion stays the same this won't change
 
@@ -423,4 +426,5 @@ const EmotionProvider = ({ children }) => {
 
 export default EmotionProvider
 
+// Hook
 export const useEmotion = () => useContext(EmotionContext)

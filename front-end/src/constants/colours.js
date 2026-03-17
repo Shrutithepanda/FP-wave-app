@@ -1,10 +1,13 @@
+/**
+ * Colour codes (hex) for app elements
+ */
 export const Colours = {
     primary: "#6D21AB",
     secondary: "#A054DE",
     error: "#E87476",
     cancel: "#E75254",
     background: "#F0F0F0",
-    container: "#F9F9F9",
+    container: "#FFF",
     disabledBg: "#DEDEDE",
     disabledBorder: "#A2A0A0",
     cardBg: "#F3EAFB",

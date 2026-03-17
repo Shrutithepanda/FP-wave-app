@@ -1,13 +1,14 @@
-import { Box, Checkbox, IconButton, styled, Typography } from "@mui/material"
+import { Box, Button, Checkbox, IconButton, styled, Tooltip, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Bookmark, BookmarkFill } from "react-bootstrap-icons"
 
+import useApi from "../hooks/useApi"
 import { TASK_API_URLS } from "../services/api.urls"
 import { routes } from "../constants/routes"
 import { Colours } from "../constants/colours"
-import useApi from "../hooks/useApi"
 
+// Styled MUI components
 const Wrapper = styled(Box) ({
     display: "flex",
     alignItems: "center",
@@ -73,7 +74,6 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
     const toggleHighPriorityTasks = () => {
         toggleHighPriorityService.call({ id: project.id, priority: !project.priority })
         setRefresh(prevState => !prevState)
-        window.location.reload()
     }
 
     /**
@@ -112,26 +112,35 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
 
     return (
         <Wrapper sx = {{ background: Colours.cardBg }}>
-            {/* Checkbox to mark project important or un-important */}
-            <Checkbox 
-                size = "small" 
-                // checked if the id value exists in the array - selectedProjects
-                checked = { selectedProjects.includes(project.id) } 
-                onChange = { onValueChange }
-            />
+            {/* Checkbox */}
+            <Tooltip title = "Select">
+                <Checkbox 
+                    size = "small" 
+                    // checked if the id value exists in the array - selectedProjects
+                    checked = { selectedProjects.includes(project.id) } 
+                    onChange = { onValueChange }
+                    slotProps = {{
+                        input: { "aria-label": "checkbox" }
+                    }}
+                />
+            </Tooltip>
 
             {/* Bookmark icon - filled if project is marked important */}
             {project.priority === true
-                ? <IconButton size = "small" onClick = { toggleHighPriorityTasks } sx = {{ marginRight: 1 }}>
-                    <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} />
-                </IconButton>
-                : <IconButton size = "small" onClick = { toggleHighPriorityTasks } sx = {{ marginRight: 1 }}>
-                    <Bookmark size = {20} style = {{ flexShrink: 0 }} />
-                </IconButton>
+                ? <Tooltip title = "Mark un-important">
+                    <IconButton size = "small" onClick = { toggleHighPriorityTasks } sx = {{ marginRight: 1 }}>
+                        <BookmarkFill size = {20} color = {Colours.bookmark} style = {{flexShrink: 0}} aria-label = "bookmark" />
+                    </IconButton>
+                </Tooltip>
+                : <Tooltip title = "Mark important">
+                    <IconButton size = "small" onClick = { toggleHighPriorityTasks } sx = {{ marginRight: 1 }}>
+                        <Bookmark size = {20} style = {{ flexShrink: 0 }} aria-label = "bookmark" />
+                    </IconButton>
+                </Tooltip>
             }
 
             {/* Project info. Navigates to ViewProject page on click. */}
-            <Box 
+            <Button 
                 onClick = {
                     // Route to ViewProject component path
                     () => {
@@ -149,6 +158,8 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
                     flexDirection: "column", 
                     alignItems: "flex-start", 
                     justifyContent: "space-between", 
+                    textTransform: "none",
+                    color: "#000",
                     flexGrow: 1, 
                     paddingTop: 1, 
                     paddingBottom: 1
@@ -196,7 +207,7 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
                     </Box>
                 </StyledText>
                 
-            </Box>
+            </Button>
         </Wrapper>
     )
 }

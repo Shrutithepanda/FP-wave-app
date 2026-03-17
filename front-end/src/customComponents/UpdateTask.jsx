@@ -11,6 +11,7 @@ import { useAuth } from "../hooks/AuthProvider"
 import useApi from "../hooks/useApi"
 import { Colours } from "../constants/colours"
 
+// Styled MUI components
 const dialogStyle = {
     display: "flex",
     flexGrow: 1,
@@ -65,7 +66,8 @@ const Footer = styled(Box) ({
  */
 const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
     const [data, setData] = useState(task)
-    const [status, setStatus] = useState("")
+    const [error, setError] = useState("")
+    const [_, setStatus] = useState("")
 
     // Destructure the user object from useAuth hook - for user id
     const { user } = useAuth()
@@ -75,25 +77,16 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
 
     /**
      * Close the dialog with previous data
-     * @param {*} e 
      */
     const closeDialog = (e) => {
         e.preventDefault() 
         setOpenDialog(false)
         setData(task)
-    }
-
-    /**
-     * Close when clicked outside of the dialog. Keep the previous data.
-     */
-    const closeOnClickAway = () => {
-        setOpenDialog(false)
-        setData(task)
+        setError("")
     }
 
     /**
      * Update a task in the Tasks table with the required fields
-     * @param {*} e 
      */
     const updateTask = (e) => {
         e.preventDefault()
@@ -108,26 +101,31 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
             due_date: data?.due_date,
             folder: "view"
         }
-
-        // Call the API and pass the body as a parameter
-        updateTaskService.call(body)
-        
-        // If no error is returned, close the dialog box, set data to the updated data and reload
-        if (!updateTaskService?.error) {
-            setOpenDialog(false)
-            setData(data)
-            
-            window.location.reload()
-        }
-        else {
-            // In case of error
+        // If empty data is being sent, display error 
+        if (data?.task_name == "" || data?.status == undefined || data?.due_date == undefined) {
             setOpenDialog(true)
+            setError("All fields must be filled")
+        }
+        else if (data?.task_name && data?.status && data?.due_date) { // If there is data in all fields ...
+            // Call the API and pass the body as a parameter
+            updateTaskService.call(body)
+            
+            // If no error is returned, close the dialog box, set data to the updated data and reload
+            if (!updateTaskService?.error) {
+                setOpenDialog(false)
+                setData(data)
+                window.location.reload()
+            }
+            else {
+                // In case of error keep the dialog open and show the error
+                setOpenDialog(true)
+                setError(updateTaskService?.error)
+            }
         }
     }
 
     /**
      * Set the data to the data entered in the input fields
-     * @param {*} e 
      */
     const onValueChange = (e) => {        
         // Store value and name based on the DateTimePicker or TextFields
@@ -144,14 +142,14 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
         <Box>
             <Dialog
                 open = { openDialog }
-                onClose = { closeOnClickAway }
+                onClose = { (e) => closeDialog(e) }
                 PaperProps = {{ sx: dialogStyle }}
             >
                 {/* Header containing dialog title and close button */}
                <Header>
                     <Typography>Update task</Typography>
                     <IconButton onClick = { (e) => closeDialog(e) }>
-                        <XLg size = {15} color = "#000" />
+                        <XLg size = {15} color = "#000" aria-label = "close update task dialog" />
                     </IconButton>
                </Header>
 
@@ -161,6 +159,7 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
                     <InputBase 
                         value = { data.task_name } 
                         name = "task_name" 
+                        aria-label = "Task name"
                         onChange = { (e) => onValueChange(e) } 
                     />
 
@@ -170,13 +169,14 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
                         <Select
                             label = "Status"
                             name = "status"
+                            aria-label = "Status"
                             value = { data.status }
                             onChange = { (e) => onValueChange(e) }
                         >
-                            <MenuItem value = {"Not started"}>Not started</MenuItem>
-                            <MenuItem value = {"In progress"}>In progress</MenuItem>
-                            <MenuItem value = {"Completed"}>Completed</MenuItem>
-                            <MenuItem value = {"Pending"}>Pending</MenuItem>
+                            <MenuItem value = {"Not started"} aria-label = "Not started">Not started</MenuItem>
+                            <MenuItem value = {"In progress"} aria-label = "In progress">In progress</MenuItem>
+                            <MenuItem value = {"Completed"} aria-label = "Completed">Completed</MenuItem>
+                            <MenuItem value = {"Pending"} aria-label = "Pending">Pending</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -193,11 +193,16 @@ const UpdateTask = ({ openDialog, setOpenDialog, projectId, task }) => {
                     </LocalizationProvider>
                </FieldWrapper>
 
-                {/* Footer containing the update button */}
+                {/* Footer containing the update button and error */}
                <Footer>
                     <SendButton onClick = { (e) => updateTask(e) } >
                         Update
                     </SendButton>
+                    
+                    {/* Error */}
+                    <Typography sx = {{ fontWeight: 600, color: Colours.error }}>
+                        {error ? error : <></>}
+                    </Typography>
                </Footer>
             </Dialog>
         </Box>

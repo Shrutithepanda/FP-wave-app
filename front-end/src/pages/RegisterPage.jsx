@@ -5,6 +5,7 @@ import Loader from '../customComponents/Loader'
 import { Box, styled, TextField, Link, Card, Typography, Button } from '@mui/material'
 import { Colours } from '../constants/colours'
 
+// Styled MUI components
 const StyledCard = styled(Card) ({
   padding: "20px 60px",   
   backgroundColor: "#F4F4FF",
@@ -34,6 +35,7 @@ const RegisterPage = () => {
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState("")
   
+  // Register function from the useAuth hook
   const { register } = useAuth()
 
   /**
@@ -75,7 +77,8 @@ const RegisterPage = () => {
   }
 
   // If loading display the loader otherwise the content
-  return (loading 
+  return (
+    loading 
     ?
       (
         <Box>
@@ -84,56 +87,60 @@ const RegisterPage = () => {
       )
     : (
       <Box style = {{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
-        <StyledCard>
-          {/* Heading and link to the Home page */}
-          <Typography variant = "h4">Register</Typography>
-          <Link href = "/">Home</Link>
-          
+        <main>
+          <StyledCard>
+            {/* Heading and link to the Home page */}
+            <Typography variant = "h1" sx = {{ fontSize: 35, fontWeight: 500 }}>Register</Typography>
+            <Link href = "/">Home</Link>
+            
 
-          {/* If there is a message, display it */}
-          {message && <Typography color = "error">{message}</Typography>}
+            {/* If there is a message, display it */}
+            {message && <Typography color = "error"  sx = {{ fontWeight: 600 }}>{message}</Typography>}
 
-          {/* Email and password fields */}
-          <FormContainer>
-            <TextField 
-              required
-              label = "Emails address" 
-              variant = "outlined" 
-              size = "small"
-              fullWidth
-              value = { email }
-              onChange = { (e) => setEmail(e.target.value) }
-            />
+            {/* Email and password fields */}
+            <FormContainer>
+              <TextField 
+                required
+                label = "Emails address" 
+                aria-label = "email address"
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                value = { email }
+                onChange = { (e) => setEmail(e.target.value) }
+              />
 
-            <TextField 
-              required
-              label = "Password" 
-              type = "password"
-              variant = "outlined" 
-              size = "small"
-              fullWidth
-              value = {password}
-              onChange = { (e) => setPassword(e.target.value) }
-            />
-          </FormContainer>
+              <TextField 
+                required
+                label = "Password" 
+                aria-label = "password"
+                type = "password"
+                variant = "outlined" 
+                size = "small"
+                fullWidth
+                value = {password}
+                onChange = { (e) => setPassword(e.target.value) }
+              />
+            </FormContainer>
 
-          {/* Submit button */}
-          <Button 
-            onClick = { handleSubmit } 
-            variant = "contained" 
-            disabled = { loading } 
-            data-testid = "register-btn"
-          >
-            Register
-          </Button>
+            {/* Submit button */}
+            <Button 
+              onClick = { handleSubmit } 
+              variant = "contained" 
+              disabled = { loading } 
+              data-testid = "register-btn"
+            >
+              Register
+            </Button>
 
-          {/* Link to the Login page */}
-          <Typography>
-            Already have an account? &nbsp;
-            <Link href = "/login">Login</Link>
-          </Typography>
+            {/* Link to the Login page */}
+            <Typography>
+              Already have an account? &nbsp;
+              <Link href = "/login">Login</Link>
+            </Typography>
 
-        </StyledCard>
+          </StyledCard>
+        </main>
       </Box>
     )
   )

@@ -1,5 +1,5 @@
-import { lazy, useEffect } from "react"
-import { createBrowserRouter, createRoutesFromElements, Navigate, Route, Routes } from "react-router-dom"
+import { lazy } from "react"
+import { createBrowserRouter, createRoutesFromElements, Navigate, Route } from "react-router-dom"
 import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
