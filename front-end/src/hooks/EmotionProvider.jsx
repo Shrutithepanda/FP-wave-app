@@ -314,14 +314,14 @@ const EmotionProvider = ({ children }) => {
     // Every 5 seconds, read the list at current index
     useEffect(() => {
         // Un-comment out these lines to read current information from dummy emotion data
-        if (camOn) {
-            const interval = setInterval(() => {
-                setCurrentEmotion(dummyEmotionData[index])
-                setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
-            }, 3000)
+        // if (camOn) {
+        //     const interval = setInterval(() => {
+        //         setCurrentEmotion(dummyEmotionData[index])
+        //         setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
+        //     }, 3000)
 
-            return () => clearInterval(interval)
-        }
+        //     return () => clearInterval(interval)
+        // }
     }, [camOn, index])
 
     // Detect stress from the current emotion list
@@ -389,7 +389,7 @@ const EmotionProvider = ({ children }) => {
         }
         
         // Un-comment this line to calculate stress on dummy data
-        calculateDummyStress()
+        // calculateDummyStress()
     }, [currentEmotion]) // if current emotion stays the same this won't change
 
     useEffect(() => {

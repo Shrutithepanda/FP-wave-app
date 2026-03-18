@@ -207,7 +207,7 @@ const ViewEmail = () => {
                     
                     <Container>
                         <Box sx = {{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                            <Typography sx = {{ marginTop: 10, fontWeight: "bold" }}>
+                            <Typography sx = {{ marginTop: 1.5, fontWeight: "bold" }}>
                                 {email.name}
                                 <Box component = "span" sx = {{ fontWeight: "normal" }}>&nbsp; - &nbsp;{email.send_to}</Box>
                             </Typography>
@@ -219,7 +219,7 @@ const ViewEmail = () => {
                                 { (new window.Date(email.created_at)).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) }
                             </Date>
                         </Box>
-                        <Typography sx = {{ marginTop: 20, marginRight: 30 }}>{email.email_body}</Typography>
+                        <Typography sx = {{ marginTop: 3, marginRight: 5 }}>{email.email_body}</Typography>
                     </Container>
                 </Box>
             </main>

@@ -31,6 +31,7 @@ const Indicator = styled(Box) ({
     justifyContent: "flex-end",
     color: "#222",
     padding: "0 7px",
+    marginRight: 0,
     textWrap: "nowrap",
     borderRadius: "15px 0 0 15px",
     height: 25,
@@ -161,8 +162,7 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
                     textTransform: "none",
                     color: "#000",
                     flexGrow: 1, 
-                    paddingTop: 1, 
-                    paddingBottom: 1
+                    paddingRight: 0
                 }}
             >
                 {/* Project title, due data and indicator */}
@@ -174,10 +174,7 @@ const Project = ({ project, selectedProjects, setSelectedProjects, type, setRefr
                                 { (new window.Date(project.due_date)).toLocaleDateString("default", {month: "short"}) }, &nbsp;
                                 { (new window.Date(project.due_date)).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"}) }
                             </Date>
-                            <Indicator
-                                sx = {{ backgroundColor: indicatorColor }}
-                            >
-                                {/* <CircleFill size = {10} color = {barColor} style = {{marginRight: 5}} /> */}
+                            <Indicator sx = {{ backgroundColor: indicatorColor }}>
                                 <Typography>
                                     {project.status}
                                 </Typography>
