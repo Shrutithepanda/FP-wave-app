@@ -8,6 +8,7 @@ import { Trash3, X, XLg } from "react-bootstrap-icons"
 import useApi from "../hooks/useApi"
 import { TASK_API_URLS } from "../services/api.urls"
 import { Colours } from "../constants/colours"
+import { useAuth } from "../hooks/AuthProvider"
 
 // Styled MUI components
 const dialogStyle = {
@@ -65,6 +66,8 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
     const [error, setError] = useState("")
     const [openSnackbar, setOpenSnackbar] = useState(false)
 
+    const { user } = useAuth()
+
     // Initialise services
     const createProjectService = useApi(TASK_API_URLS.createProject)
     const saveProjectToDraftService = useApi(TASK_API_URLS.saveProjectToDraft)
@@ -83,6 +86,7 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
 
         // Data to be inserted in the table
         const body = {
+            user_id: user?.id,
             title: data?.title,
             description: data?.description,
             due_date: data?.due_date,
@@ -131,6 +135,7 @@ const ComposeProject = ({ openDialog, setOpenDialog }) => {
         
         // Data to be inserted in the table
         const body = {
+            user_id: user?.id,
             title: data?.title,
             description: data?.description,
             due_date: data?.due_date,

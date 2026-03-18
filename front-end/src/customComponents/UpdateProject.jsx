@@ -9,6 +9,7 @@ import { XLg } from "react-bootstrap-icons"
 import { TASK_API_URLS } from "../services/api.urls"
 import useApi from "../hooks/useApi"
 import { Colours } from "../constants/colours"
+import { useAuth } from "../hooks/AuthProvider"
 
 // Styled MUI components
 const dialogStyle = {
@@ -66,6 +67,8 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
     const [data, setData] = useState(project)
     const [error, setError] = useState("")
     const [_, setStatus] = useState("")
+
+    const { user } = useAuth()
 
     // Initialise the update project service
     const updateProjectService = useApi(TASK_API_URLS.updateProject)
@@ -126,6 +129,7 @@ const UpdateProject = ({ openDialog, setOpenDialog, project }) => {
             // Data to be updated in the table with default folder name - projects
             const body = {
                 id: project.id,
+                user_id: user?.id,
                 title: data?.title,
                 description: data?.description,
                 status: data?.status,
