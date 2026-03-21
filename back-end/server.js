@@ -5,7 +5,7 @@ import routes from "./routes/route.js"
 
 dotenv.config()
 
-const port = process.env.PORT
+const port = process.env.PORT || 8000
 const app = express()
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))

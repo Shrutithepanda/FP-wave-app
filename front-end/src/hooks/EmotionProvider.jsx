@@ -30,7 +30,7 @@ const EmotionProvider = ({ children }) => {
      * @returns detected emotion in the picture
      */
     const captureAndDetectEmotions = async () => {
-        // source: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
+        // Some code taken from: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
         if (videoRef.current && canvasRef.current) {
             // Set refs to current values
             const video = videoRef.current
@@ -80,7 +80,7 @@ const EmotionProvider = ({ children }) => {
     const startCapturing = async () => {
         setCamOn(true)
 
-        // source: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
+        // Some code taken from: https://github.com/PratikN7572/garbhsanskar-next-web-app/blob/a2dd6e085acd79124f01ebfeb3297b3cdd9d65f8/ui/Webcam.jsx
         // If media devices are available then set the video reference to the stream
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices
@@ -183,12 +183,14 @@ const EmotionProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        // Ideally after permission is granted, camera will start capturing on load
+        // Ideally after permission is granted, camera will automatically start capturing on load
         // startCapturing()
 
         // Capture and detect emotion through API call very 5 seconds
         if (camOn) {
-            // Un-comment this line to capture and request the API to detect emotions
+            // Capture and request the Rekogntition API to detect emotions
+            // ➡️ 1 Un-comment the following line (194) line to request emotion detection from API 
+            // (after creating .env file in the backend folder with required API variables provided in the submission area)
             // captureIntervalRef.current = setInterval(captureAndDetectEmotions, 5000)
         }
         return () => clearInterval(captureIntervalRef.current)
@@ -201,14 +203,10 @@ const EmotionProvider = ({ children }) => {
             calculateStress()
         }
     }, [emotions])
-
+    
     useEffect(() => {
-        // Un-comment this line to see the current emotion and stress levels on the console
-        // console.log(`${emotions[0]?.Type}`)
-    }, [emotions])
-
-    useEffect(() => {
-        // console.log(`Emotion: ${emotions[0]?.Type}, \nLen: ${emotionsInInterval.length} \nStress level: ${stressLevel}`)
+        // Print the interval length, emotion detected and stress levels to the console
+        // console.log(`Interval: ${emotionsInInterval.length}, Emotion: ${emotions[0]?.Type}, Stress level: ${stressLevel}`)
     }, [emotions, emotionsInInterval, stressed])
 
     // ================ Code to detect stress from hard-coded emotions object every 5 seconds ================
@@ -311,17 +309,18 @@ const EmotionProvider = ({ children }) => {
         ],
     ]
 
-    // Every 5 seconds, read the list at current index
+    // Every 5 seconds, read the array at current index
     useEffect(() => {
-        // Un-comment out these lines to read current information from dummy emotion data
-        // if (camOn) {
-        //     const interval = setInterval(() => {
-        //         setCurrentEmotion(dummyEmotionData[index])
-        //         setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
-        //     }, 3000)
+        // ➡️ 2 Comment out these lines when detecting emotions using Rekongition API
+        // Read current information from dummy emotion data
+        if (camOn) {
+            const interval = setInterval(() => {
+                setCurrentEmotion(dummyEmotionData[index])
+                setIndex((prevIndex) => (prevIndex + 1) % dummyEmotionData.length)
+            }, 5000)
 
-        //     return () => clearInterval(interval)
-        // }
+            return () => clearInterval(interval)
+        }
     }, [camOn, index])
 
     // Detect stress from the current emotion list
@@ -387,14 +386,15 @@ const EmotionProvider = ({ children }) => {
                 idRef.current = 0
             }
         }
-        
-        // Un-comment this line to calculate stress on dummy data
-        // calculateDummyStress()
+
+        // ➡️ 3 Comment out the function call (392) when detecting emotions using Rekongition API
+        // Calculate stress on dummy data
+        calculateDummyStress()
     }, [currentEmotion]) // if current emotion stays the same this won't change
 
     useEffect(() => {
-        // console.log("array:", emotionsInInterval)
-        // console.log("Stress level:", stressLevel)
+        // Print the interval length, current emotion from the dummy data and stress levels to console
+        // console.log(`Interval: ${emotionsInInterval.length}, Emotion: ${currentEmotion[0]?.Type}, Stress level: ${stressLevel}`)
     }, [emotionsInInterval, stressLevel])
     
     return (
