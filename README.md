@@ -23,4 +23,4 @@ Wave is an emotion-aware adaptive email and task manager app to help reduce work
 
 **Note** <br>
 Provide camera permissions after starting the app. <br>
-The adaptive features - content restructuring only work on the Inbox page of the emails tab and the Projects page of the tasks tab, and breathing exercise suggestion works on Inbox and View email page of the emails tab and Projects and View project page of the tasks tab. For other pages in both tabs only change in shadow colour adaptive feature works.
+The adaptive feature - content restructuring only works on the Inbox page of the emails tab and the Projects page of the tasks tab. For the other pages in both tabs, both the change in shadow colour and breathing exercise adaptive features work.
